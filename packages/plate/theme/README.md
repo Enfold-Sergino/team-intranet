@@ -10,7 +10,8 @@ block has a component.
 
 ## Sync from Plate
 
-Once: install the CLI and set `PLATE_THEME_PRN` in the root `.env` (the full PRN, not just the ID).
+Once: install the CLI, copy `.env.example` to `.env` in this package and set `PLATE_THEME_PRN` (the
+full PRN, not just the ID).
 
 ```sh
 pnpm add -g @lars-plate/delta-cli

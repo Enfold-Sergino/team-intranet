@@ -1,5 +1,5 @@
 // `pnpm plate:sync`: refresh delta/ from Plate with the Delta CLI, check it, then show what changed.
-// Needs the CLI (`pnpm add -g @lars-plate/delta-cli`) and PLATE_THEME_PRN in the root .env. Runs with
+// Needs the CLI (`pnpm add -g @lars-plate/delta-cli`) and PLATE_THEME_PRN in this package's .env. Runs with
 // Node's type stripping, so it only imports theme.ts (no workspace packages).
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
@@ -11,13 +11,13 @@ const DELTA = "delta";
 const SCRATCH = ".delta";
 const FETCHED = join(SCRATCH, "fetched");
 
-if (existsSync("../../../.env")) process.loadEnvFile("../../../.env");
+if (existsSync(".env")) process.loadEnvFile(".env"); // packages/plate/theme/.env
 function fail(message: string): never {
   console.error(`\n${message}`);
   process.exit(1);
 }
 if (!process.env.PLATE_THEME_PRN)
-  fail("Set PLATE_THEME_PRN in .env: the full PRN of the theme in Plate.");
+  fail("Set PLATE_THEME_PRN in packages/plate/theme/.env: the full PRN of the theme in Plate.");
 const profile = process.env.PLATE_DELTA_PROFILE?.trim() || undefined;
 
 function run(command: string, args: string[]) {

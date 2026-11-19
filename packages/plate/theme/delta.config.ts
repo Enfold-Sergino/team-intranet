@@ -1,7 +1,10 @@
 // Delta CLI config, used by `pnpm plate:sync` (`delta theme sync`). Written by hand: `delta theme
 // init` only supports Next and Nuxt.
 const prn = process.env.PLATE_THEME_PRN;
-if (!prn) throw new Error("Set PLATE_THEME_PRN in .env: the full PRN of the theme in Plate.");
+if (!prn)
+  throw new Error(
+    "Set PLATE_THEME_PRN in packages/plate/theme/.env: the full PRN of the theme in Plate.",
+  );
 
 export default {
   directories: {
