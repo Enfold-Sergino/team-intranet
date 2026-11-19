@@ -1,0 +1,41 @@
+---
+import type { Asset } from "@team-intranet/core";
+import { withBase } from "../../lib/url";
+import Link from "./Link.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  summary?: string | null;
+  image?: Asset | null;
+}
+const { href, title, summary, image } = Astro.props;
+---
+
+<article class="relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-xs transition hover:border-accent hover:shadow-md">
+  {image && (
+    <img
+      src={withBase(image.url)}
+      alt={image.alt ?? ""}
+      loading="lazy"
+      width="600"
+      height="300"
+      class="aspect-2/1 w-full object-cover"
+    />
+  )}
+  <div class="flex flex-1 flex-col gap-2 p-4">
+    {Astro.slots.has("meta") && (
+      <div class="flex flex-wrap gap-2">
+        <slot name="meta" />
+      </div>
+    )}
+    <h3 class="font-semibold">
+      <!-- The link covers the whole card. -->
+      <Link href={href} icon class="text-ink no-underline after:absolute after:inset-0">
+        {title}
+      </Link>
+    </h3>
+    {summary && <p class="text-sm text-ink-muted">{summary}</p>}
+    <slot />
+  </div>
+</article>

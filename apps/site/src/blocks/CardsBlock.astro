@@ -1,0 +1,45 @@
+---
+import type { BlockProps } from "@team-intranet/core";
+import Link from "../components/ui/Link.astro";
+import RichText from "../components/ui/RichText.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import { columnClasses } from "../lib/layout";
+import { withBase } from "../lib/url";
+
+type Props = BlockProps<"cards">;
+const { title, cards, columns } = Astro.props;
+---
+
+{cards.length > 0 && (
+  <section>
+    <SectionHeading title={title} />
+    <ul class:list={["grid gap-4", columnClasses(columns ?? 3, 4)]}>
+      {cards.map((card) => (
+        <li class="overflow-hidden rounded-xl border border-line bg-surface">
+          {card.image && (
+            <img
+              src={withBase(card.image.url)}
+              alt={card.image.alt ?? ""}
+              loading="lazy"
+              class="aspect-2/1 w-full object-cover"
+            />
+          )}
+          <div class="p-4">
+            {card.title && (
+              <h3 class="mb-2 font-semibold">
+                {card.link ? (
+                  <Link href={card.link} icon>
+                    {card.title}
+                  </Link>
+                ) : (
+                  card.title
+                )}
+              </h3>
+            )}
+            <RichText content={card.body} headingOffset={2} class="text-sm" />
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

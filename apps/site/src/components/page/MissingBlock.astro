@@ -1,0 +1,28 @@
+---
+// Stands in for a block that can't render (no component, or props that don't match the contract).
+// Only shown in development and in the live editor; on the published site the block is left out.
+import { fileNameForType } from "./registry";
+
+interface Props {
+  type: string;
+  error?: string;
+}
+const { type, error } = Astro.props;
+---
+
+<div
+  class="rounded-xl border-2 border-dashed border-warning bg-warning-soft p-4 text-sm text-warning"
+  role="note"
+>
+  {error ? (
+    <p>
+      Block <code>{type}</code> has content that doesn't match its schema: {error}
+    </p>
+  ) : (
+    <p>
+      No component for block <code>{type}</code>. Add{" "}
+      <code>src/blocks/{fileNameForType(type)}</code>.
+    </p>
+  )}
+  <slot />
+</div>

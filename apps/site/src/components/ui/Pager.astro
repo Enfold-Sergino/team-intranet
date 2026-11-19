@@ -1,0 +1,41 @@
+---
+// Previous / next at the end of a page that is read in order (procedures, courses).
+import { withBase } from "../../lib/url";
+import Icon from "./Icon.astro";
+
+interface PageLink {
+  href: string;
+  title: string;
+}
+interface Props {
+  previous?: PageLink | null;
+  next?: PageLink | null;
+  label?: string;
+}
+const { previous, next, label = "Pages in this section" } = Astro.props;
+const link =
+  "flex flex-col gap-1 rounded-xl border border-line bg-surface p-4 no-underline hover:border-accent";
+---
+
+{(previous || next) && (
+  <nav class="mt-4 grid gap-4 sm:grid-cols-2" aria-label={label}>
+    {previous ? (
+      <a class={link} href={withBase(previous.href)} rel="prev">
+        <span class="flex items-center gap-1 text-sm text-ink-muted">
+          <Icon name="arrow" size={16} class="rotate-180" /> Previous
+        </span>
+        <span class="font-medium text-ink">{previous.title}</span>
+      </a>
+    ) : (
+      <span />
+    )}
+    {next && (
+      <a class:list={[link, "text-right"]} href={withBase(next.href)} rel="next">
+        <span class="flex items-center justify-end gap-1 text-sm text-ink-muted">
+          Next <Icon name="arrow" size={16} />
+        </span>
+        <span class="font-medium text-ink">{next.title}</span>
+      </a>
+    )}
+  </nav>
+)}

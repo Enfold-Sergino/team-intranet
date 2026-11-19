@@ -45,7 +45,7 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | 1   | `core`: model, block/item contract, validation, site helpers, with their tests | The ported tests pass                           | Done   |
 | 2   | `plate/connector`, `plate/cast`, `plate/source`                                | Same pages and items as the old loader          |        |
 | 3   | Site blocks and layout in Tailwind, rendering core types                       | Every block matches the old site; build passes  |        |
-| 4   | Build integration (encryption, search, links, report) and deploy workflows     | Deploys behind the login; webhook rebuild works |        |
+| 4   | Build integration (encryption, search, links, report), host-independent        | The built site works behind the login           |        |
 | 5   | `plate/editor` + `/preview`; `plate/theme` sync and check                      | Draft preview and click-to-select work in Plate |        |
 | 6   | README, `ARCHITECTURE.md` ("add a CMS adapter"), editor guide                  | Old repo archived                               |        |
 
@@ -63,6 +63,18 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
   value type, which the core shapes need (smart text → HAST, asset, path part, tag, linked item), so
   `plate/source` maps the accessible format itself. delta-client still supplies the value type names,
   and will supply the editor connection and the GraphQL → accessible converter in phase 5.
+- **A demo source** (`apps/site/src/content/demo.ts`, invented content) lets CI build the site and
+  anyone try it without CMS secrets: `CONTENT_SOURCE=demo`.
+- **Rich text is sanitized on render** (`hast-util-sanitize`), then adapted to the site: headings
+  shifted below the page title, base path, external links in a new tab.
+- **Dropped:** the root block's `show-sidebar` field (the root block is gone) and the hidden header
+  navigation links. The sidebar shows on every page.
+- **Hosting is decided later** (EU-based, for the GDPR/AVG). Until then the build stays
+  host-independent: a static folder, and no requests to third parties from visitors' browsers
+  (the Inter font is self-hosted with `@fontsource-variable/inter`).
+- **Hosting is decided later** (EU-based, for the GDPR/AVG). Until then the build stays
+  host-independent: a static folder, and no requests to third parties from visitors' browsers
+  (the Inter font is self-hosted with `@fontsource-variable/inter`).
 - **The live preview is CMS-agnostic:** the adapter delivers a core `Page`, and the site's `/preview`
   route renders it with the same components.
 
@@ -87,7 +99,18 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | `cda.ts`: mapping, tags, `assertUniquePaths`              | `plate/source/map.ts`, `source.ts`                |
 | `lib/site.ts`: `useHomeAlias`, `parseItemLanguages`       | `plate/source/source.ts`                          |
 
-Left for later phases: `url.ts`, `date.ts`, `blocks.ts` (phase 3, site); `content-report.ts`, `return-to.ts`, `session.ts`,
+## Moved in phase 3
+
+| From `plate-intranet`                           | To `apps/site`                                             |
+| ----------------------------------------------- | ---------------------------------------------------------- |
+| `src/blocks/*` (scoped CSS)                     | `src/blocks/*` (Tailwind), typed with `BlockProps<…>`      |
+| `components/ui`, `components/layout`, `layouts` | same folders, Tailwind; `Link` handles base + new tab      |
+| `components/experience/*`                       | `components/page/*` (`PageView`, `BlockRenderer`)          |
+| `lib/site.ts` (`getSite`)                       | `src/content/index.ts` (picks the source)                  |
+| `lib/cast.ts` (render, excerpt)                 | `lib/rich-text.ts` (sanitize + adapt), core `rich-text.ts` |
+| `lib/url.ts`, `date.ts`, `blocks.ts`            | `lib/url.ts`, `date.ts`, `blocks.ts`                       |
+
+Left for later phases: `content-report.ts`, `return-to.ts`, `session.ts`,
 search index extraction (phase 4, site integrations).
 
 ## Risks

@@ -1,0 +1,102 @@
+---
+// Overview of child pages (projects, procedures, …). Card data comes from each page's primary item,
+// so editors maintain it once. Also rendered without props to list the children of an empty page.
+import {
+  excerpt,
+  hasTag,
+  itemData,
+  type BlockProps,
+  type Page,
+  type RichText,
+} from "@team-intranet/core";
+import Badge from "../components/ui/Badge.astro";
+import Card from "../components/ui/Card.astro";
+import Icon from "../components/ui/Icon.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import StatusBadge from "../components/ui/StatusBadge.astro";
+import type { RenderContext } from "../lib/context";
+import { formatDate } from "../lib/date";
+import { withBase } from "../lib/url";
+
+type Props = Partial<BlockProps<"experience-list">> & { ctx: RenderContext };
+const { ctx, title, contentType, tag, limit } = Astro.props;
+const { site } = ctx;
+// Match on treeId too, so a parent picked as "/home" finds the homepage served at "/".
+const parentPath = Astro.props.parent?.path;
+const parent = parentPath
+  ? site.pages.find((p) => p.path === parentPath || p.treeId === parentPath)
+  : ctx.page;
+
+const firstText = (page: Page) => {
+  const block = page.blocks.find((b) => b.type === "content" && b.props.content);
+  return block ? excerpt(block.props.content as RichText) : null;
+};
+const statusRank: Record<string, number> = { active: 0, planned: 1, "on-hold": 2, done: 3 };
+const entries = (parent ? site.children(parent) : [])
+  .filter((p) => !contentType || p.primaryItem?.type === contentType)
+  .filter((p) => !tag || hasTag([...p.tags, ...(p.primaryItem?.tags ?? [])], tag))
+  .map((page) => ({
+    page,
+    project: itemData(page.primaryItem, "project"),
+    procedure: itemData(page.primaryItem, "procedure"),
+  }))
+  .sort(
+    (a, b) =>
+      (statusRank[a.project?.status ?? ""] ?? 9) - (statusRank[b.project?.status ?? ""] ?? 9),
+  )
+  .slice(0, limit ?? undefined)
+  .map(({ page, project, procedure }) => ({
+    href: page.path,
+    title: site.title(page),
+    summary: project?.summary ?? procedure?.summary ?? page.description ?? firstText(page),
+    image: project?.coverImage ?? null,
+    status: project?.status ?? null,
+    client: project?.client ?? null,
+    category: procedure?.category?.name ? procedure.category : null,
+    owner: procedure?.owner?.name ?? null,
+    reviewed: formatDate(procedure?.lastReviewed),
+  }));
+---
+
+<section>
+  <SectionHeading title={title} />
+  {entries.length === 0 ? (
+    <p class="text-ink-muted">Nothing published here yet.</p>
+  ) : Astro.props.view === "list" ? (
+    <ul class="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
+      {entries.map((entry) => (
+        <li>
+          <a
+            href={withBase(entry.href)}
+            class="flex items-center gap-4 p-4 text-ink no-underline hover:bg-surface-muted"
+          >
+            <span class="flex min-w-0 flex-1 flex-col">
+              <span class="font-medium">{entry.title}</span>
+              {entry.summary && <span class="text-sm text-ink-muted">{entry.summary}</span>}
+            </span>
+            <span class="hidden flex-wrap items-center gap-3 text-sm text-ink-muted sm:flex">
+              {entry.category && <Badge color={entry.category.color}>{entry.category.name}</Badge>}
+              {entry.owner && <span>Owner: {entry.owner}</span>}
+              {entry.reviewed && <span>Reviewed {entry.reviewed}</span>}
+            </span>
+            <Icon name="chevron" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {entries.map((entry) => (
+        <li>
+          <Card href={entry.href} title={entry.title} summary={entry.summary} image={entry.image}>
+            <Fragment slot="meta">
+              <StatusBadge status={entry.status} />
+              {entry.client && <Badge>{entry.client}</Badge>}
+              {entry.category && <Badge color={entry.category.color}>{entry.category.name}</Badge>}
+            </Fragment>
+          </Card>
+        </li>
+      ))}
+    </ul>
+  )}
+</section>

@@ -1,0 +1,16 @@
+---
+import type { BlockProps } from "@team-intranet/core";
+import { withBase } from "../lib/url";
+
+type Props = BlockProps<"image">;
+const { image, altText } = Astro.props;
+---
+
+{image && (
+  <img
+    src={withBase(image.url)}
+    alt={altText ?? image.alt ?? ""}
+    loading="lazy"
+    class="max-h-[36rem] w-auto max-w-full rounded-xl"
+  />
+)}

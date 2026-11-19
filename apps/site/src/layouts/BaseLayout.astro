@@ -1,13 +1,17 @@
 ---
+import type { LanguageLink } from "@team-intranet/core";
+import { withBase } from "../lib/url";
 import "../styles/global.css";
 
 interface Props {
   title: string;
-  description?: string;
+  description?: string | null;
   /** Language of the page (BCP 47). */
   lang?: string;
+  /** The page in other languages (hreflang). */
+  alternates?: LanguageLink[];
 }
-const { title, description, lang = "en-GB" } = Astro.props;
+const { title, description, lang = "en-GB", alternates = [] } = Astro.props;
 ---
 
 <!doctype html>
@@ -17,10 +21,23 @@ const { title, description, lang = "en-GB" } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} data-favicon />
+    {alternates.map((link) => (
+      <link rel="alternate" hreflang={link.language.code} href={withBase(link.href)} />
+    ))}
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
   <body>
     <slot />
+    <script>
+      // Alternate the tab icon between the two logos.
+      const icon = document.querySelector<HTMLLinkElement>("link[data-favicon]");
+      if (icon) {
+        const first = icon.href;
+        const second = first.replace(/favicon\.svg$/, "favicon-red.svg");
+        setInterval(() => (icon.href = icon.href === first ? second : first), 3000);
+      }
+    </script>
   </body>
 </html>

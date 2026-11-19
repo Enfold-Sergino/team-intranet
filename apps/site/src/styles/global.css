@@ -1,9 +1,12 @@
 @import "tailwindcss";
+/* Self-hosted: no visitor IP addresses go to a font service (GDPR). */
+@import "@fontsource-variable/inter";
 @plugin "@tailwindcss/typography";
 
 /* Design tokens: change the brand here. light-dark() follows the visitor's colour scheme. */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans:
+    "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --color-canvas: light-dark(#f6f7f9, #0f1117);
   --color-surface: light-dark(#ffffff, #171a22);
@@ -37,4 +40,24 @@
   :focus-visible {
     @apply rounded-sm outline-2 outline-offset-2 outline-accent;
   }
+}
+
+/* Rich text (typography plugin) in the site's colours, so it follows light and dark. */
+.prose {
+  --tw-prose-body: var(--color-ink);
+  --tw-prose-headings: var(--color-ink);
+  --tw-prose-lead: var(--color-ink-muted);
+  --tw-prose-links: var(--color-accent);
+  --tw-prose-bold: var(--color-ink);
+  --tw-prose-counters: var(--color-ink-muted);
+  --tw-prose-bullets: var(--color-ink-muted);
+  --tw-prose-hr: var(--color-line);
+  --tw-prose-quotes: var(--color-ink-muted);
+  --tw-prose-quote-borders: var(--color-accent);
+  --tw-prose-captions: var(--color-ink-muted);
+  --tw-prose-code: var(--color-ink);
+  --tw-prose-pre-code: var(--color-ink);
+  --tw-prose-pre-bg: var(--color-surface-muted);
+  --tw-prose-th-borders: var(--color-line);
+  --tw-prose-td-borders: var(--color-line);
 }

@@ -1,0 +1,29 @@
+---
+import { withBase } from "../../lib/url";
+
+interface Props {
+  trail: { title: string; href: string }[];
+}
+const { trail } = Astro.props;
+---
+
+{trail.length > 1 && (
+  <nav aria-label="Breadcrumb" class="mb-6 text-sm text-ink-muted">
+    <ol class="flex flex-wrap items-center gap-1">
+      {trail.map((crumb, index) => (
+        <li class="flex items-center gap-1">
+          {index > 0 && <span aria-hidden="true">/</span>}
+          {index === trail.length - 1 ? (
+            <span aria-current="page" class="text-ink">
+              {crumb.title}
+            </span>
+          ) : (
+            <a href={withBase(crumb.href)} class="text-ink-muted hover:text-accent">
+              {crumb.title}
+            </a>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}

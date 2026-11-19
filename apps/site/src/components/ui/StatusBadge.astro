@@ -1,0 +1,18 @@
+---
+import Badge from "./Badge.astro";
+
+interface Props {
+  status?: string | null;
+}
+const { status } = Astro.props;
+// Values of the project item's `status` field (packages/core schemas).
+const statuses = {
+  planned: ["Planned", "info"],
+  active: ["Active", "success"],
+  "on-hold": ["On hold", "warning"],
+  done: ["Done", "neutral"],
+} as const;
+const [label, tone] = statuses[status as keyof typeof statuses] ?? [status, "neutral"];
+---
+
+{status && <Badge tone={tone}>{label}</Badge>}

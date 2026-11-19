@@ -1,0 +1,24 @@
+---
+import type { BlockProps } from "@team-intranet/core";
+import RichText from "../components/ui/RichText.astro";
+import type { Placement } from "../lib/context";
+
+type Props = BlockProps<"content"> & { placement?: Placement };
+const { title, content, placement } = Astro.props;
+// The page title → h1; deep inside sections (e.g. a card) → h3; otherwise h2.
+const Heading = placement?.isPageTitle ? "h1" : (placement?.depth ?? 0) >= 2 ? "h3" : "h2";
+---
+
+<section>
+  {title && (
+    <Heading
+      class:list={[
+        "mb-3 font-semibold tracking-tight",
+        Heading === "h1" ? "text-3xl" : Heading === "h2" ? "text-xl" : "text-lg",
+      ]}
+    >
+      {title}
+    </Heading>
+  )}
+  <RichText content={content} headingOffset={1} />
+</section>

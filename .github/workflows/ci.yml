@@ -21,3 +21,6 @@ jobs:
       - run: pnpm check
       - run: pnpm test
       - run: pnpm build
+        env:
+          # Invented content: CI checks that the site builds without CMS secrets.
+          CONTENT_SOURCE: demo

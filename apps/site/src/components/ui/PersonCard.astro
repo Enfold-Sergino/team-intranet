@@ -1,0 +1,24 @@
+---
+import type { ItemData } from "@team-intranet/core";
+import Avatar from "./Avatar.astro";
+
+interface Props {
+  person: ItemData<"person">;
+  compact?: boolean;
+}
+const { person, compact = false } = Astro.props;
+const name = person.name ?? "Unknown";
+---
+
+<div class="flex items-center gap-3">
+  <Avatar name={name} src={person.photo?.url} size={compact ? 32 : 44} />
+  <div class="min-w-0 leading-tight">
+    <p class="font-medium">{name}</p>
+    {person.role && <p class="text-sm text-ink-muted">{person.role}</p>}
+    {person.email && !compact && (
+      <a class="text-sm break-all" href={`mailto:${person.email}`}>
+        {person.email}
+      </a>
+    )}
+  </div>
+</div>

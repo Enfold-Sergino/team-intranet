@@ -1,0 +1,41 @@
+---
+// Renders a block and its children. Blocks that can't render are left out with their children,
+// except in development and the live editor, where the problem shows in place.
+import { parseBlockProps, type Block } from "@team-intranet/core";
+import type { Placement, RenderContext } from "../../lib/context";
+import MissingBlock from "./MissingBlock.astro";
+import { blocks } from "./registry";
+
+interface Props {
+  block: Block;
+  ctx: RenderContext;
+  placement: Placement;
+}
+const { block, ctx, placement } = Astro.props;
+const Component = Object.hasOwn(blocks, block.type) ? blocks[block.type] : undefined;
+const parsed = parseBlockProps(block);
+const child = (index: number): Placement => ({
+  depth: placement.depth + 1,
+  index,
+  isPageTitle: false,
+});
+const visible = ctx.dev || ctx.editor;
+---
+
+{Component && parsed.ok ? (
+  <div class="contents" data-block-type={block.type} data-block-id={visible ? block.id : undefined}>
+    <Component {...parsed.props} ctx={ctx} placement={placement}>
+      {block.children.map((c, i) => (
+        <Astro.self block={c} ctx={ctx} placement={child(i)} />
+      ))}
+    </Component>
+  </div>
+) : (
+  visible && (
+    <MissingBlock type={block.type} error={parsed.ok ? undefined : parsed.error}>
+      {block.children.map((c, i) => (
+        <Astro.self block={c} ctx={ctx} placement={child(i)} />
+      ))}
+    </MissingBlock>
+  )
+)}

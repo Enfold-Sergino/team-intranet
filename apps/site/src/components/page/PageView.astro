@@ -1,0 +1,48 @@
+---
+// A page's body: tags, title, blocks, child pages and previous/next. Shared by the static routes and
+// (phase 5) the live editor preview, so a draft looks exactly like the published page.
+import { isEmpty, type Page, type RichText, type Site } from "@team-intranet/core";
+import ExperienceListBlock from "../../blocks/ExperienceListBlock.astro";
+import Pager from "../ui/Pager.astro";
+import TagList from "../ui/TagList.astro";
+import { firstBlockIsTitle, rendersOwnTitle } from "../../lib/blocks";
+import type { RenderContext } from "../../lib/context";
+import BlockRenderer from "./BlockRenderer.astro";
+
+interface Props {
+  page: Page;
+  /** The site in the page's language. */
+  site: Site;
+  dev: boolean;
+  editor?: boolean;
+}
+const { page, site, dev, editor = false } = Astro.props;
+const ctx: RenderContext = { site, page, dev, editor };
+const titleIsFirst = firstBlockIsTitle(page.blocks);
+// A page without content (a section like /projects) lists its child pages instead of staying blank.
+const titleOnly = page.blocks.every(
+  (b) => b.type === "content" && !b.children.length && isEmpty(b.props.content as RichText),
+);
+const listChildren = titleOnly && site.children(page).length > 0;
+const { previous, next } = site.neighbours(page);
+const link = (p: Page | null) => (p ? { href: p.path, title: site.title(p) } : null);
+---
+
+<div class="flex flex-col gap-8">
+  {page.path !== site.root && <TagList tags={page.tags} />}
+  {!rendersOwnTitle(page.blocks) && (
+    <h1 class="text-3xl font-semibold tracking-tight">{site.title(page)}</h1>
+  )}
+  {page.blocks.map((block, index) => (
+    <BlockRenderer
+      block={block}
+      ctx={ctx}
+      placement={{ depth: 0, index, isPageTitle: index === 0 && titleIsFirst }}
+    />
+  ))}
+  {listChildren && <ExperienceListBlock ctx={ctx} />}
+  {page.blocks.length === 0 && !listChildren && (dev || editor) && (
+    <p class="text-ink-muted">This page has no blocks or child pages yet.</p>
+  )}
+  <Pager previous={link(previous)} next={link(next)} />
+</div>

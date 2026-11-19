@@ -1,0 +1,44 @@
+---
+// Rows typed as text, cells separated by "|"; cells may link as [label](url).
+import { cellParts, splitRow, type BlockProps } from "@team-intranet/core";
+import Link from "../components/ui/Link.astro";
+
+type Props = BlockProps<"table">;
+const { header, content } = Astro.props;
+const rows = content.map(splitRow);
+const columns = header ? splitRow(header) : [];
+const width = Math.max(columns.length, ...rows.map((r) => r.length), 1);
+const pad = (cells: string[]) => [...cells, ...Array<string>(width - cells.length).fill("")];
+const cell = "border-b border-line px-3 py-2 text-left align-top";
+---
+
+{(columns.length > 0 || rows.length > 0) && (
+  <div class="overflow-x-auto rounded-xl border border-line bg-surface">
+    <table class="w-full border-collapse text-sm">
+      {columns.length > 0 && (
+        <thead class="bg-surface-muted">
+          <tr>
+            {pad(columns).map((c) => (
+              <th scope="col" class:list={[cell, "font-semibold"]}>
+                {c}
+              </th>
+            ))}
+          </tr>
+        </thead>
+      )}
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            {pad(row).map((c) => (
+              <td class={cell}>
+                {cellParts(c).map((part) =>
+                  "href" in part ? <Link href={part.href}>{part.text}</Link> : part.text,
+                )}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}

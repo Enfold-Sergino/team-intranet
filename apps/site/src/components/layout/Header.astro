@@ -1,0 +1,65 @@
+---
+import type { LanguageLink, Site } from "@team-intranet/core";
+import Icon from "../ui/Icon.astro";
+import { withBase } from "../../lib/url";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+
+interface Props {
+  site: Site;
+  languages: LanguageLink[];
+}
+const { site, languages } = Astro.props;
+const { siteName, logo } = site.settings;
+---
+
+<header class="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur">
+  <button
+    type="button"
+    aria-controls="sidebar"
+    aria-expanded="false"
+    data-nav-toggle
+    class="rounded-lg p-2 hover:bg-surface-muted lg:hidden"
+  >
+    <Icon name="menu" size={20} />
+    <span class="sr-only">Open navigation</span>
+  </button>
+  <a href={withBase(site.root)} class="flex items-center gap-2 font-semibold text-ink no-underline">
+    <img src={withBase(logo?.url ?? "/assets/logo.svg")} alt="" height="32" class="h-8 w-auto" />
+    <span class="hidden sm:inline">{siteName}</span>
+  </a>
+  <form
+    role="search"
+    action={withBase("/search/")}
+    method="get"
+    class="ml-auto flex items-center gap-2 rounded-lg border border-line bg-canvas px-3 py-1.5"
+  >
+    <Icon name="search" size={16} class="text-ink-muted" />
+    <label class="sr-only" for="site-search">
+      Search the intranet
+    </label>
+    <input
+      id="site-search"
+      name="q"
+      type="search"
+      placeholder="Search"
+      class="w-28 bg-transparent text-sm outline-none sm:w-48"
+    />
+  </form>
+  <LanguageSwitcher links={languages} />
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+  const sidebar = document.querySelector<HTMLElement>("[data-sidebar]");
+  const setOpen = (open: boolean) => {
+    sidebar?.toggleAttribute("data-open", open);
+    toggle?.setAttribute("aria-expanded", String(open));
+  };
+  toggle?.addEventListener("click", () => setOpen(!sidebar?.hasAttribute("data-open")));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && sidebar?.hasAttribute("data-open")) {
+      setOpen(false);
+      toggle?.focus();
+    }
+  });
+</script>

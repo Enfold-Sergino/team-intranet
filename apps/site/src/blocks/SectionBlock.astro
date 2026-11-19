@@ -1,0 +1,24 @@
+---
+import type { BlockProps } from "@team-intranet/core";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import type { Placement } from "../lib/context";
+import { columnClasses } from "../lib/layout";
+
+type Props = BlockProps<"section"> & { placement?: Placement };
+const { title, intro, placement } = Astro.props;
+const columns = Math.min(3, Math.max(1, Astro.props.columns ?? 1));
+// A one-column section inside another section is a card (e.g. migrated office or person rows).
+const isCard = (placement?.depth ?? 0) >= 1 && columns === 1;
+const hasBlocks = Astro.slots.has("default");
+---
+
+{(title || intro || hasBlocks) && (
+  <section class:list={{ "rounded-xl border border-line bg-surface p-4": isCard }}>
+    <SectionHeading title={title} intro={intro} />
+    {hasBlocks && (
+      <div class:list={["grid gap-6", columnClasses(columns, 3)]}>
+        <slot />
+      </div>
+    )}
+  </section>
+)}

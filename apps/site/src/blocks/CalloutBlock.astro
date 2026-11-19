@@ -1,0 +1,22 @@
+---
+import type { BlockProps } from "@team-intranet/core";
+import Icon from "../components/ui/Icon.astro";
+import RichText from "../components/ui/RichText.astro";
+
+type Props = BlockProps<"callout">;
+const { title, body } = Astro.props;
+const tones = {
+  info: ["info", "border-info bg-info-soft text-info"],
+  warning: ["warning", "border-warning bg-warning-soft text-warning"],
+  success: ["check", "border-success bg-success-soft text-success"],
+} as const;
+const [icon, classes] = tones[Astro.props.tone ?? "info"];
+---
+
+<aside class:list={["flex gap-3 rounded-xl border-l-4 p-4", classes]} role="note">
+  <Icon name={icon} size={20} class="mt-0.5" />
+  <div class="text-ink">
+    {title && <p class="mb-1 font-semibold">{title}</p>}
+    <RichText content={body} />
+  </div>
+</aside>

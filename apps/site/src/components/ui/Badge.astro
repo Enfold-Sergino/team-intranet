@@ -1,0 +1,25 @@
+---
+const tones = {
+  neutral: "bg-surface-muted text-ink-muted",
+  accent: "bg-accent-soft text-accent",
+  info: "bg-info-soft text-info",
+  warning: "bg-warning-soft text-warning",
+  success: "bg-success-soft text-success",
+};
+interface Props {
+  tone?: keyof typeof tones;
+  /** A tag colour, shown as a dot. */
+  color?: string | null;
+}
+const { tone = "neutral", color } = Astro.props;
+---
+
+<span
+  class:list={[
+    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+    tones[tone],
+  ]}
+>
+  {color && <span class="size-2 rounded-full" style={`background:${color}`} aria-hidden="true" />}
+  <slot />
+</span>

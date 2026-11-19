@@ -1,0 +1,17 @@
+---
+import type { RichText } from "@team-intranet/core";
+import { renderRichText } from "../../lib/rich-text";
+
+interface Props {
+  content: RichText | null | undefined;
+  /** Shift headings below the surrounding title (1: an h1 in the content becomes an h2). */
+  headingOffset?: number;
+  class?: string;
+}
+const { content, headingOffset = 0, class: className } = Astro.props;
+const html = renderRichText(content, { headingOffset });
+---
+
+{html && (
+  <div class:list={["prose max-w-[72ch] prose-li:my-1 [&_li>p]:my-0", className]} set:html={html} />
+)}

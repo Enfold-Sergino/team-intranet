@@ -1,0 +1,89 @@
+---
+// One static page per published page, plus redirects, plus a generated overview for a language root
+// that has no page of its own.
+import type { Language, Page } from "@team-intranet/core";
+import Card from "../components/ui/Card.astro";
+import PageView from "../components/page/PageView.astro";
+import { getSite, languages } from "../content";
+import AppLayout from "../layouts/AppLayout.astro";
+import { withBase } from "../lib/url";
+import { languageOf } from "@team-intranet/core";
+
+type Props =
+  | { page: Page; root?: never; redirectTo?: never }
+  | { page?: never; root: string; redirectTo?: never }
+  | { page?: never; root?: never; redirectTo: string };
+
+export async function getStaticPaths() {
+  const site = await getSite();
+  const param = (path: string) => (path === "/" ? undefined : path.slice(1));
+  return [
+    ...site.pages.map((page) => ({ params: { path: param(page.path) }, props: { page } })),
+    ...languages
+      .filter((l) => !site.page(l.root))
+      .map((l) => ({ params: { path: param(l.root) }, props: { root: l.root } })),
+    ...Object.entries(site.content.redirects).map(([from, to]) => ({
+      params: { path: param(from) },
+      props: { redirectTo: to },
+    })),
+  ];
+}
+
+const { page, root, redirectTo } = Astro.props;
+const whole = await getSite();
+const language: Language = languageOf(page?.path ?? root ?? "/", languages);
+// Blocks, navigation and settings only see pages and items in the page's language.
+const site = whole.forLanguage(language);
+const dev = import.meta.env.DEV;
+---
+
+{redirectTo ? (
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="refresh" content={`0; url=${withBase(redirectTo)}`} />
+      <link rel="canonical" href={withBase(redirectTo)} />
+      <title>Redirecting…</title>
+    </head>
+    <body>
+      <a href={withBase(redirectTo)}>Continue</a>
+    </body>
+  </html>
+) : page ? (
+  <AppLayout
+    site={site}
+    title={page.seoTitle || site.title(page)}
+    description={page.description}
+    currentPath={page.path}
+    breadcrumbs={whole.breadcrumbs(page).map((p) => ({ title: whole.title(p), href: p.path }))}
+  >
+    <PageView page={page} site={site} dev={dev} />
+  </AppLayout>
+) : (
+  <AppLayout site={site} title={site.settings.siteName} currentPath={site.root}>
+    <h1 class="mb-2 text-3xl font-semibold tracking-tight">{site.settings.siteName}</h1>
+    <p class="mb-8 text-ink-muted">
+      {dev
+        ? `No page at "${site.root}" yet: create one in the CMS. Until then this overview is generated.`
+        : "Choose a section to get started."}
+    </p>
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {site
+        .navigation()
+        .filter((node) => node.path !== site.root)
+        .map((node) => (
+          <li>
+            <Card
+              href={node.path}
+              title={node.title}
+              summary={
+                node.children.length
+                  ? `${node.children.length} page${node.children.length === 1 ? "" : "s"}`
+                  : null
+              }
+            />
+          </li>
+        ))}
+    </ul>
+  </AppLayout>
+)}

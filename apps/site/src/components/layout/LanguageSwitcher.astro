@@ -1,0 +1,60 @@
+---
+// The same page in the other language, or that language's home when there is no translation yet.
+import type { LanguageLink } from "@team-intranet/core";
+import { withBase } from "../../lib/url";
+
+interface Props {
+  links: LanguageLink[];
+}
+const { links } = Astro.props;
+const current = links.find((link) => link.current);
+const onHome = current !== undefined && current.href === current.language.root;
+---
+
+{links.length > 1 && (
+  <nav aria-label="Language" data-language-home={onHome ? "" : undefined}>
+    <ul class="flex rounded-lg border border-line p-0.5 text-xs font-semibold">
+      {links.map((link) => (
+        <li>
+          <a
+            href={withBase(link.href)}
+            hreflang={link.language.code}
+            lang={link.language.code}
+            aria-current={link.current ? "true" : undefined}
+            title={link.exists ? link.language.name : `${link.language.name} (home)`}
+            data-language={link.language.code}
+            data-current={link.current ? "" : undefined}
+            class="block rounded-md px-2 py-1 text-ink-muted no-underline aria-current:bg-accent aria-current:text-on-accent"
+          >
+            <span aria-hidden="true">{link.language.label}</span>
+            <span class="sr-only">{link.language.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<script>
+  // Remember the chosen language: opening a home page later goes to the home of that language.
+  const KEY = "team-intranet-language";
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-language]")];
+  for (const link of links)
+    link.addEventListener("click", () => {
+      try {
+        localStorage.setItem(KEY, link.dataset.language ?? "");
+      } catch {
+        /* storage blocked */
+      }
+    });
+  if (document.querySelector("[data-language-home]")) {
+    let preferred: string | null = null;
+    try {
+      preferred = localStorage.getItem(KEY);
+    } catch {
+      /* storage blocked */
+    }
+    const target = links.find((link) => link.dataset.language === preferred);
+    if (target && !("current" in target.dataset)) window.location.replace(target.href);
+  }
+</script>

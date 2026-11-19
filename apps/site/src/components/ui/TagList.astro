@@ -1,0 +1,24 @@
+---
+import type { Tag } from "@team-intranet/core";
+import Badge from "./Badge.astro";
+
+interface Props {
+  tags: Tag[];
+}
+const tags = Astro.props.tags.filter((tag) => tag.name);
+// Parent tags are context: "P&O › New hires".
+const group = (tag: Tag) =>
+  tag.path?.includes("/") ? tag.path.split("/").slice(0, -1).join(" › ") : null;
+---
+
+{tags.length > 0 && (
+  <ul class="flex flex-wrap gap-2" aria-label="Tags">
+    {tags.map((tag) => (
+      <li>
+        <Badge color={tag.color}>
+          {group(tag) && <span class="opacity-70">{group(tag)}:</span>} {tag.name}
+        </Badge>
+      </li>
+    ))}
+  </ul>
+)}

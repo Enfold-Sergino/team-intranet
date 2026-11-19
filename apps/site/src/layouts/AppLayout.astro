@@ -1,0 +1,48 @@
+---
+// The shell around every content page: header, sidebar, breadcrumbs and footer.
+import type { Site } from "@team-intranet/core";
+import Breadcrumbs from "../components/layout/Breadcrumbs.astro";
+import Footer from "../components/layout/Footer.astro";
+import Header from "../components/layout/Header.astro";
+import Sidebar from "../components/layout/Sidebar.astro";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  /** The site in the page's language. */
+  site: Site;
+  title: string;
+  description?: string | null;
+  currentPath: string;
+  breadcrumbs?: { title: string; href: string }[];
+}
+const { site, title, description, currentPath, breadcrumbs = [] } = Astro.props;
+const { siteName, footerText } = site.settings;
+const languages = site.languageLinks(currentPath);
+---
+
+<BaseLayout
+  title={title === siteName ? title : `${title} · ${siteName}`}
+  description={description}
+  lang={site.language?.code}
+  alternates={languages.filter((link) => link.exists)}
+>
+  <a
+    href="#main"
+    class="sr-only z-50 rounded-lg bg-accent px-4 py-2 text-on-accent focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+  >
+    Skip to content
+  </a>
+  <Header site={site} languages={languages} />
+  <div class="lg:grid lg:grid-cols-[18rem_1fr]">
+    <Sidebar site={site} currentPath={currentPath} />
+    <div class="min-w-0 px-4 py-8 sm:px-8">
+      <main id="main" tabindex="-1" class="mx-auto max-w-5xl outline-none">
+        <Breadcrumbs trail={breadcrumbs} />
+        <slot />
+      </main>
+      <div class="mx-auto max-w-5xl">
+        <Footer text={footerText} updatedAt={site.content.fetchedAt} />
+      </div>
+    </div>
+  </div>
+</BaseLayout>

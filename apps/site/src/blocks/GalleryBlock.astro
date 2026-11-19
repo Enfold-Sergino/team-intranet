@@ -1,0 +1,29 @@
+---
+import type { BlockProps } from "@team-intranet/core";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import { columnClasses } from "../lib/layout";
+import { withBase } from "../lib/url";
+
+type Props = BlockProps<"gallery">;
+const { title, images, columns } = Astro.props;
+---
+
+{images.length > 0 && (
+  <section>
+    <SectionHeading title={title} />
+    <ul class:list={["grid grid-cols-2 gap-3", columnClasses(columns ?? 3, 6)]}>
+      {images.map((image) => (
+        <li>
+          <a href={withBase(image.url)} target="_blank" rel="noopener noreferrer">
+            <img
+              src={withBase(image.url)}
+              alt={image.alt ?? ""}
+              loading="lazy"
+              class="aspect-square w-full rounded-lg border border-line bg-surface object-contain p-2"
+            />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

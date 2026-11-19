@@ -1,0 +1,45 @@
+---
+import type { NavNode, Site } from "@team-intranet/core";
+import Icon from "../ui/Icon.astro";
+import { withBase } from "../../lib/url";
+
+interface Props {
+  nodes: NavNode[];
+  site: Site;
+  currentPath: string;
+}
+const { nodes, site, currentPath } = Astro.props;
+const link =
+  "block flex-1 rounded-md px-2 py-1.5 text-sm text-ink no-underline hover:bg-surface-muted aria-[current=page]:bg-accent-soft aria-[current=page]:font-medium aria-[current=page]:text-accent";
+---
+
+<ul class="flex flex-col gap-0.5">
+  {nodes.map((node) => {
+    const current = node.path === currentPath ? "page" : undefined;
+    return (
+      <li data-nav-item data-title={node.title.toLowerCase()}>
+        {node.children.length > 0 ? (
+          <details open={site.isActive(node, currentPath)} class="group">
+            <summary class="flex cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden">
+              <a href={withBase(node.path)} aria-current={current} class={link}>
+                {node.title}
+              </a>
+              <Icon
+                name="chevron"
+                size={14}
+                class="mx-1 text-ink-muted transition-transform group-open:rotate-90"
+              />
+            </summary>
+            <div class="ml-3 border-l border-line pl-2">
+              <Astro.self nodes={node.children} site={site} currentPath={currentPath} />
+            </div>
+          </details>
+        ) : (
+          <a href={withBase(node.path)} aria-current={current} class={link}>
+            {node.title}
+          </a>
+        )}
+      </li>
+    );
+  })}
+</ul>

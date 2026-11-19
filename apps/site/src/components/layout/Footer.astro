@@ -1,0 +1,21 @@
+---
+import { formatDate } from "../../lib/date";
+
+interface Props {
+  text: string | null;
+  updatedAt: string;
+}
+const { text, updatedAt } = Astro.props;
+const time = new Date(updatedAt).toLocaleTimeString("en-GB", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Amsterdam",
+});
+---
+
+<footer class="mt-16 flex flex-wrap justify-between gap-2 border-t border-line pt-6 text-sm text-ink-muted">
+  <span>{text ?? "Team iDA · Enfold"}</span>
+  <span>
+    Content updated {formatDate(updatedAt)}, {time}
+  </span>
+</footer>

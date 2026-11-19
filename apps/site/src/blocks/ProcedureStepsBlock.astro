@@ -1,0 +1,59 @@
+---
+// A procedure: from the block's own field, else the page's primary item.
+import { itemData, type BlockProps } from "@team-intranet/core";
+import Badge from "../components/ui/Badge.astro";
+import PersonCard from "../components/ui/PersonCard.astro";
+import RichText from "../components/ui/RichText.astro";
+import type { RenderContext } from "../lib/context";
+import { formatDate } from "../lib/date";
+
+type Props = BlockProps<"procedure-steps"> & { ctx: RenderContext };
+const { ctx } = Astro.props;
+const data = Astro.props.procedure ?? itemData(ctx.page.primaryItem, "procedure");
+const reviewed = formatDate(data?.lastReviewed);
+const steps = data?.steps ?? [];
+---
+
+<article class="flex flex-col gap-8">
+  <header class="flex flex-col items-start gap-3">
+    {data?.category?.name && <Badge color={data.category.color}>{data.category.name}</Badge>}
+    <h1 class="text-3xl font-semibold tracking-tight">{data?.title ?? ctx.page.title}</h1>
+    {data?.summary && <p class="text-lg text-ink-muted">{data.summary}</p>}
+    <div class="flex flex-wrap gap-8 text-sm">
+      {data?.owner && (
+        <div>
+          <span class="mb-1 block text-xs font-medium tracking-wide text-ink-muted uppercase">
+            Owner
+          </span>
+          <PersonCard person={data.owner} compact />
+        </div>
+      )}
+      {reviewed && (
+        <div>
+          <span class="mb-1 block text-xs font-medium tracking-wide text-ink-muted uppercase">
+            Last reviewed
+          </span>
+          {reviewed}
+        </div>
+      )}
+    </div>
+  </header>
+  {steps.length > 0 && (
+    <ol class="flex flex-col gap-4">
+      {steps.map((step, index) => (
+        <li class="flex gap-4 rounded-xl border border-line bg-surface p-4">
+          <span
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent font-semibold text-on-accent"
+            aria-hidden="true"
+          >
+            {index + 1}
+          </span>
+          <div class="min-w-0">
+            <h2 class="mb-2 text-lg font-semibold">{step.title ?? `Step ${index + 1}`}</h2>
+            <RichText content={step.body} headingOffset={2} />
+          </div>
+        </li>
+      ))}
+    </ol>
+  )}
+</article>

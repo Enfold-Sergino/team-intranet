@@ -1,0 +1,26 @@
+---
+// A link that prefixes site paths with the base and opens external URLs in a new tab.
+import type { HTMLAttributes } from "astro/types";
+import { isExternal, withBase } from "../../lib/url";
+import Icon from "./Icon.astro";
+
+interface Props extends HTMLAttributes<"a"> {
+  href: string;
+  /** Show the "opens in a new tab" icon on external links. */
+  icon?: boolean;
+}
+const { href, icon = false, ...rest } = Astro.props;
+const external = isExternal(href);
+---
+
+<a
+  href={withBase(href)}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
+  {...rest}
+>
+  <slot />
+  {external && icon && (
+    <Icon name="external" size={14} label="(opens in a new tab)" class="ml-1 inline align-[-2px]" />
+  )}
+</a>

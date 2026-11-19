@@ -1,0 +1,70 @@
+---
+// Every `link` item, grouped by its category tag (alphabetically), optionally only one category.
+import { compareTitles, itemData, type BlockProps } from "@team-intranet/core";
+import Card from "../components/ui/Card.astro";
+import type { RenderContext } from "../lib/context";
+
+type Props = BlockProps<"link-directory"> & { ctx: RenderContext };
+const { ctx, title, tag } = Astro.props;
+const OTHER = "Other";
+const groups = new Map<
+  string,
+  {
+    name: string;
+    color: string | null;
+    links: { title: string; url: string; description: string | null }[];
+  }
+>();
+for (const item of ctx.site.itemsOfType("link")) {
+  const data = itemData(item, "link");
+  if (!data?.url || (tag && data.category?.id !== tag.id)) continue;
+  const name = data.category?.name ?? OTHER;
+  if (!groups.has(name)) groups.set(name, { name, color: data.category?.color ?? null, links: [] });
+  groups
+    .get(name)!
+    .links.push({ title: data.title ?? item.title, url: data.url, description: data.description });
+}
+const sorted = [...groups.values()]
+  .sort((a, b) => (a.name === OTHER ? 1 : b.name === OTHER ? -1 : compareTitles(a.name, b.name)))
+  .map((group) => ({
+    ...group,
+    id: group.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    links: group.links.sort((a, b) => compareTitles(a.title, b.title)),
+  }));
+---
+
+<section class="flex flex-col gap-8">
+  <h1 class="text-3xl font-semibold tracking-tight">{title ?? "Links"}</h1>
+  {sorted.length > 1 && (
+    <nav class="flex flex-wrap gap-2" aria-label="Link categories">
+      {sorted.map((group) => (
+        <a
+          href={`#${group.id}`}
+          class="rounded-full border border-line bg-surface px-3 py-1 text-sm no-underline hover:border-accent"
+        >
+          {group.name} <span class="text-ink-muted">{group.links.length}</span>
+        </a>
+      ))}
+    </nav>
+  )}
+  {sorted.length === 0 && <p class="text-ink-muted">No links published yet.</p>}
+  {sorted.map((group) => (
+    <section id={group.id} aria-labelledby={`${group.id}-title`} class="scroll-mt-20">
+      <h2 id={`${group.id}-title`} class="mb-3 flex items-center gap-2 text-xl font-semibold">
+        <span
+          class="size-2.5 rounded-full bg-ink-muted"
+          style={group.color ? `background:${group.color}` : undefined}
+          aria-hidden="true"
+        />
+        {group.name}
+      </h2>
+      <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {group.links.map((link) => (
+          <li>
+            <Card href={link.url} title={link.title} summary={link.description} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</section>

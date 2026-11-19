@@ -1,0 +1,21 @@
+---
+import type { BlockProps } from "@team-intranet/core";
+import PersonCard from "../components/ui/PersonCard.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+
+type Props = BlockProps<"team-list">;
+const { title, people } = Astro.props;
+---
+
+{people.length > 0 && (
+  <section>
+    <SectionHeading title={title ?? "Team"} />
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {people.map((person) => (
+        <li class="rounded-xl border border-line bg-surface p-4">
+          <PersonCard person={person} />
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
