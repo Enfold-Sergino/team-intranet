@@ -1,0 +1,13 @@
+{
+  "name": "@team-intranet/plate-cast",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Plate rich text (CAST) to HAST, the core model's rich text format.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  }
+}

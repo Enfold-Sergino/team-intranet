@@ -1,0 +1,13 @@
+{
+  "name": "@team-intranet/plate-theme",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Plate theme snapshot (delta/), sync with the Delta CLI and check against the core block contract.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  }
+}

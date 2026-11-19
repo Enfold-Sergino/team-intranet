@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Design tokens: change the brand here. light-dark() follows the visitor's colour scheme. */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-canvas: light-dark(#f6f7f9, #0f1117);
+  --color-surface: light-dark(#ffffff, #171a22);
+  --color-surface-muted: light-dark(#f1f3f6, #1e222c);
+  --color-line: light-dark(#e3e6eb, #2a2f3b);
+  --color-ink: light-dark(#161a22, #e8eaf0);
+  --color-ink-muted: light-dark(#5b6474, #9aa3b5);
+  --color-accent: light-dark(#3b3bd6, #8b8bff);
+  --color-accent-strong: light-dark(#2b2bb0, #a9a9ff);
+  --color-accent-soft: light-dark(#ececfd, #23234a);
+  --color-on-accent: light-dark(#ffffff, #0f1117);
+  --color-info: light-dark(#1d4ed8, #8fb0ff);
+  --color-info-soft: light-dark(#e8efff, #18223d);
+  --color-warning: light-dark(#a16207, #f5c35b);
+  --color-warning-soft: light-dark(#fdf5dc, #2e2614);
+  --color-success: light-dark(#047857, #5fd3a8);
+  --color-success-soft: light-dark(#e3f6ee, #122a22);
+  --color-danger: light-dark(#b91c1c, #f87171);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  body {
+    @apply min-h-screen bg-canvas font-sans text-ink antialiased;
+  }
+  a {
+    @apply text-accent underline-offset-3 hover:text-accent-strong;
+  }
+  :focus-visible {
+    @apply rounded-sm outline-2 outline-offset-2 outline-accent;
+  }
+}

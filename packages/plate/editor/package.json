@@ -1,0 +1,13 @@
+{
+  "name": "@team-intranet/plate-editor",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Plate live editor connection: receives drafts as core pages and reports selected blocks.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  }
+}

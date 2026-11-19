@@ -1,0 +1,13 @@
+{
+  "name": "@team-intranet/plate-source",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ContentSource for Plate: maps experiences and content items to the core model.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@team-intranet/plate-connector",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Plate Content Delivery API transport: requests, retries, timeouts and response validation.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  }
+}
