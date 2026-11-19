@@ -9,5 +9,13 @@
   },
   "scripts": {
     "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@platecms/delta-cast-util-to-hast": "1.23.0",
+    "@team-intranet/core": "workspace:*",
+    "@types/hast": "^3.0.5"
+  },
+  "devDependencies": {
+    "hast-util-to-html": "^9.0.7"
   }
 }

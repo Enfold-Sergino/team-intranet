@@ -2,6 +2,10 @@ packages:
   - apps/*
   - packages/*
   - packages/plate/*
+
 onlyBuiltDependencies:
   - esbuild
   - sharp
+
+patchedDependencies:
+  "@platecms/delta-cast-util-to-hast@1.23.0": patches/@platecms__delta-cast-util-to-hast@1.23.0.patch
