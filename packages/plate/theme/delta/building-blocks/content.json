@@ -1,0 +1,48 @@
+{
+  "slug": "content",
+  "title": "Content",
+  "buildingBlockFields": [
+    {
+      "slug": "title",
+      "title": "Title",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "content",
+      "title": "Content",
+      "contentValidationRules": [
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "SMART_TEXT"
+            ]
+          }
+        },
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        }
+      ]
+    }
+  ]
+}

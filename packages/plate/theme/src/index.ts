@@ -1,2 +1,3 @@
-/** Plate theme snapshot (delta/), sync with the Delta CLI and check against the core block contract. Filled in a later phase. */
-export {};
+/** The Plate theme snapshot (delta/), its sync from Plate and its check against the core contract. */
+export * from "./contract";
+export * from "./theme";

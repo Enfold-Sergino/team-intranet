@@ -1,0 +1,48 @@
+{
+  "slug": "image",
+  "title": "Image",
+  "buildingBlockFields": [
+    {
+      "slug": "image",
+      "title": "Image",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "ASSET"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "alt-text",
+      "title": "Alt text",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

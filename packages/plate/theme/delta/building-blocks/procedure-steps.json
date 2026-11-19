@@ -1,0 +1,35 @@
+{
+  "slug": "procedure-steps",
+  "title": "Procedure steps",
+  "buildingBlockFields": [
+    {
+      "slug": "procedure",
+      "title": "Procedure",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "CONTENT_ITEM"
+            ]
+          }
+        },
+        {
+          "ruleType": "RELATABLE_CONTENT_TYPES",
+          "settings": {
+            "allowedContentTypes": [
+              "procedure"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

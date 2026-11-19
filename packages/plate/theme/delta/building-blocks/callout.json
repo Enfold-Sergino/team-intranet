@@ -1,0 +1,79 @@
+{
+  "slug": "callout",
+  "title": "Callout",
+  "buildingBlockFields": [
+    {
+      "slug": "tone",
+      "title": "Tone",
+      "contentValidationRules": [
+        {
+          "ruleType": "ALLOWED_VALUES",
+          "settings": {
+            "allowedValues": [
+              "info",
+              "warning",
+              "success"
+            ]
+          }
+        },
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "title",
+      "title": "Title",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "body",
+      "title": "Body",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "SMART_TEXT"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

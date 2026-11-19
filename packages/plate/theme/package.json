@@ -8,6 +8,10 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "sync": "node scripts/sync.ts"
+  },
+  "dependencies": {
+    "@team-intranet/core": "workspace:*"
   }
 }

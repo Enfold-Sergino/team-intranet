@@ -1,0 +1,90 @@
+{
+  "slug": "site-settings",
+  "name": "Site settings",
+  "contentFields": [
+    {
+      "slug": "site-name",
+      "title": "Site name",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "logo",
+      "title": "Logo",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "ASSET"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "primary-navigation",
+      "title": "Primary navigation",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 50
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "PATH_PART"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "footer-text",
+      "title": "Footer text",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "slug": "link-directory",
+  "title": "Link directory",
+  "buildingBlockFields": [
+    {
+      "slug": "title",
+      "title": "Title",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "tag",
+      "title": "Tag",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "TAG"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

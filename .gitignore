@@ -7,3 +7,7 @@ dist/
 .env.*
 !.env.example
 .DS_Store
+
+# Delta CLI scratch output (packages/plate/theme/scripts/sync.ts)
+.delta/
+delta-types.d.ts

@@ -1,0 +1,243 @@
+{
+  "slug": "project",
+  "name": "Project",
+  "contentFields": [
+    {
+      "slug": "title",
+      "title": "Title",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "summary",
+      "title": "Summary",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "client",
+      "title": "Client",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "status",
+      "title": "Status",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "ALLOWED_VALUES",
+          "settings": {
+            "allowedValues": [
+              "planned",
+              "active",
+              "on-hold",
+              "done"
+            ]
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "start-date",
+      "title": "Start date",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "DATE"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "end-date",
+      "title": "End date",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "DATE"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "cover-image",
+      "title": "Cover image",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "ASSET"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "team",
+      "title": "Team",
+      "contentValidationRules": [
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "CONTENT_ITEM"
+            ]
+          }
+        },
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 50
+          }
+        },
+        {
+          "ruleType": "RELATABLE_CONTENT_TYPES",
+          "settings": {
+            "allowedContentTypes": [
+              "person"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "repository-url",
+      "title": "Repository URL",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "links",
+      "title": "Links",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 50
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "CONTENT_ITEM"
+            ]
+          }
+        },
+        {
+          "ruleType": "RELATABLE_CONTENT_TYPES",
+          "settings": {
+            "allowedContentTypes": [
+              "link"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

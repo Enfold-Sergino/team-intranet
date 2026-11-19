@@ -4,3 +4,6 @@
 node_modules/
 .pnpm-store/
 pnpm-lock.yaml
+# The Plate theme snapshot, in the Delta CLI's own format.
+packages/plate/theme/delta/
+.delta/

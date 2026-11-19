@@ -1,0 +1,56 @@
+{
+  "slug": "quick-links",
+  "title": "Quick links",
+  "buildingBlockFields": [
+    {
+      "slug": "title",
+      "title": "Title",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "links",
+      "title": "Links",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 50
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "CONTENT_ITEM"
+            ]
+          }
+        },
+        {
+          "ruleType": "RELATABLE_CONTENT_TYPES",
+          "settings": {
+            "allowedContentTypes": [
+              "link"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

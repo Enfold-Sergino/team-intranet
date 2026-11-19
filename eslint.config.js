@@ -6,7 +6,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["**/dist/", "**/.astro/", "**/.reports/", ".pnpm-store/"] },
+  { ignores: ["**/dist/", "**/.astro/", "**/.reports/", "**/.delta/", ".pnpm-store/"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...astro.configs.recommended,

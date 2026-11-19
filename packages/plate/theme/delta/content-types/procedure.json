@@ -1,0 +1,148 @@
+{
+  "slug": "procedure",
+  "name": "Procedure",
+  "contentFields": [
+    {
+      "slug": "title",
+      "title": "Title",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "summary",
+      "title": "Summary",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "STRING"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "category",
+      "title": "Category",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "TAG"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "owner",
+      "title": "Owner",
+      "contentValidationRules": [
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "CONTENT_ITEM"
+            ]
+          }
+        },
+        {
+          "ruleType": "RELATABLE_CONTENT_TYPES",
+          "settings": {
+            "allowedContentTypes": [
+              "person"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "last-reviewed",
+      "title": "Last reviewed",
+      "contentValidationRules": [
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "DATE"
+            ]
+          }
+        },
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 1
+          }
+        }
+      ]
+    },
+    {
+      "slug": "steps",
+      "title": "Steps",
+      "contentValidationRules": [
+        {
+          "ruleType": "RELATABLE_CONTENT_TYPES",
+          "settings": {
+            "allowedContentTypes": [
+              "procedure-step"
+            ]
+          }
+        },
+        {
+          "ruleType": "COUNT",
+          "settings": {
+            "min": 0,
+            "max": 50
+          }
+        },
+        {
+          "ruleType": "VALUE_TYPE",
+          "settings": {
+            "allowedTypes": [
+              "CONTENT_ITEM"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
