@@ -49,6 +49,8 @@ export interface Block {
   name: string | null;
   props: Record<string, unknown>;
   children: Block[];
+  /** The id a CMS's live editor uses to select this block (Plate: its placement). Drafts only. */
+  editorId?: string;
 }
 
 export interface Page {

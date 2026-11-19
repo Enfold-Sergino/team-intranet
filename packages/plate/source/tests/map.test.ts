@@ -124,4 +124,5 @@ describe("tags", () => {
 it("camelCases field slugs like delta-client", () => {
   expect(toCamelCase("cta-link")).toBe("ctaLink");
   expect(toCamelCase("Primary_navigation")).toBe("primaryNavigation");
+  expect(toCamelCase("ctaLink")).toBe("ctaLink"); // drafts arrive camelCased already
 });

@@ -11,15 +11,20 @@ import { normalizePath, type Block, type Item, type Tag } from "@team-intranet/c
 /** Linked items by PRN: the CDA sends a linked item as `{ prn }` only. */
 export type Dependencies = ReadonlyMap<string, CdaItem>;
 
-/** "cta-link" → "ctaLink" (the rule delta-client's parsers use). */
+/**
+ * "cta-link" → "ctaLink" (the rule delta-client's parsers use). Keys that are already camelCase
+ * (live editor drafts, converted by delta-client) stay as they are.
+ */
 export const toCamelCase = (slug: string) =>
-  slug
-    .split(/[-_ ]+/)
-    .filter(Boolean)
-    .map((part, i) =>
-      i === 0 ? part.toLowerCase() : part[0]!.toUpperCase() + part.slice(1).toLowerCase(),
-    )
-    .join("");
+  !/[-_ ]/.test(slug)
+    ? slug
+    : slug
+        .split(/[-_ ]+/)
+        .filter(Boolean)
+        .map((part, i) =>
+          i === 0 ? part.toLowerCase() : part[0]!.toUpperCase() + part.slice(1).toLowerCase(),
+        )
+        .join("");
 
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -97,14 +102,22 @@ export const mapItem = (item: CdaItem, deps: Dependencies, locale: string | null
   data: itemData(item, deps, 0) ?? {},
 });
 
-/** A component tree as blocks. Plate's root container is dropped: a page has its blocks. */
-export function mapBlocks(component: CdaComponent, deps: Dependencies): Block[] {
+/**
+ * A component tree as blocks. Plate's root container is dropped: a page has its blocks.
+ * `editorIds` (component PRN → placement PRN) marks blocks for selection in the live editor.
+ */
+export function mapBlocks(
+  component: CdaComponent,
+  deps: Dependencies,
+  editorIds?: ReadonlyMap<string, string>,
+): Block[] {
   const toBlock = (c: CdaComponent): Block => ({
     id: c.prn,
     type: c.buildingBlockSlug,
     name: c.name ?? null,
     props: mapContent(c.content, deps),
     children: (c.components ?? []).map(toBlock),
+    ...(editorIds?.has(c.prn) ? { editorId: editorIds.get(c.prn) } : {}),
   });
   return component.buildingBlockSlug === "root"
     ? (component.components ?? []).map(toBlock)

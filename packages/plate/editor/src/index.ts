@@ -1,2 +1,3 @@
-/** Plate live editor connection: receives drafts as core pages and reports selected blocks. Filled in a later phase. */
-export {};
+/** Plate's live editor: drafts arrive as core pages, clicks select blocks in Plate. */
+export * from "./connect";
+export * from "./draft";
