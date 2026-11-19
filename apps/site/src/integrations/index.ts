@@ -40,12 +40,21 @@ async function walk(dir: string): Promise<string[]> {
   return nested.flat();
 }
 
-export default function intranet(): AstroIntegration {
+export interface IntranetOptions {
+  /** The shared login; with both set, the build is encrypted. */
+  username?: string;
+  password?: string;
+  /** How long a sign-in lasts (default 12). */
+  sessionHours?: string;
+}
+
+export default function intranet({
+  username = "",
+  password = "",
+  sessionHours,
+}: IntranetOptions = {}): AstroIntegration {
   let base = "/";
-  const env = process.env;
-  const username = env.SITE_USERNAME ?? "";
-  const password = env.SITE_PASSWORD ?? "";
-  const hours = Number(env.SESSION_HOURS || 12);
+  const hours = Number(sessionHours || 12);
 
   return {
     name: "team-intranet",
@@ -57,7 +66,7 @@ export default function intranet(): AstroIntegration {
         const problem = validateCredentials(username, password);
         if (problem) throw new Error(problem);
         if (!(hours > 0))
-          throw new Error(`SESSION_HOURS must be a positive number (got "${env.SESSION_HOURS}").`);
+          throw new Error(`SESSION_HOURS must be a positive number (got "${sessionHours}").`);
       },
       "astro:build:done": async ({ dir, logger }) => {
         const dist = fileURLToPath(dir);

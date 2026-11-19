@@ -8,8 +8,8 @@ import { report } from "../integrations/report";
 import { demoSource } from "./demo";
 import { siteOptions } from "./options";
 
-// Vite's env has .env values; process.env has what the shell or CI sets.
-const env = { ...process.env, ...import.meta.env } as Record<string, string | undefined>;
+// Vite's env has apps/site/.env; process.env has what the shell or CI sets, and wins.
+const env = { ...import.meta.env, ...process.env } as Record<string, string | undefined>;
 
 export const options = siteOptions(env);
 export const { languages } = options;

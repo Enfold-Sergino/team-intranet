@@ -36,20 +36,50 @@ with a small loader. The login page derives the same key in the browser and keep
 
 ## Settings
 
-All in `.env` locally (see `.env.example`); in CI as secrets or variables.
+Each package reads its own `.env` (git-ignored; copy its `.env.example`):
 
-| Name                                     | Purpose                                                            |
-| ---------------------------------------- | ------------------------------------------------------------------ |
-| `CONTENT_SOURCE`                         | `plate` (default) or `demo` (invented content, used by CI)         |
-| `PLATE_DELIVERY_TOKEN`                   | Channel-scoped Plate CDA token. **Secret**                         |
-| `PLATE_CDA_URL`                          | Another CDA URL (default `https://cda.platecms.app`)               |
-| `PLATE_LANGUAGE_PRNS`                    | Plate languages per site language, so items are split per language |
-| `PLATE_HOME_PATH`                        | Page served at a language root that has none (default `/home`)     |
-| `SITE_LANGUAGES`                         | `code:label:name:root,…` (default English at `/`, Dutch at `/nl`)  |
-| `SITE_USERNAME`, `SITE_PASSWORD`         | The shared login. **Secret**                                       |
-| `SESSION_HOURS`                          | How long a sign-in lasts (default 12)                              |
-| `SITE_URL`, `SITE_BASE`                  | Where the site is served                                           |
-| `PLATE_THEME_PRN`, `PLATE_DELTA_PROFILE` | For `pnpm plate:sync` only                                         |
+- `apps/site/.env`: everything the site needs, below. Astro reads it for the content, the build
+  integration for the login settings.
+- `packages/plate/theme/.env`: `PLATE_THEME_PRN` and `PLATE_DELTA_PROFILE`, for `pnpm plate:sync`
+  only.
+
+Values set in the shell or by CI win over the file.
+
+| Name                             | Purpose                                                            |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `CONTENT_SOURCE`                 | `plate` (default) or `demo` (invented content, used by CI)         |
+| `PLATE_DELIVERY_TOKEN`           | Channel-scoped Plate CDA token. **Secret**                         |
+| `PLATE_CDA_URL`                  | Another CDA URL (default `https://cda.platecms.app`)               |
+| `PLATE_LANGUAGE_PRNS`            | Plate languages per site language, so items are split per language |
+| `PLATE_HOME_PATH`                | Page served at a language root that has none (default `/home`)     |
+| `SITE_LANGUAGES`                 | `code:label:name:root,…` (default English at `/`, Dutch at `/nl`)  |
+| `SITE_USERNAME`, `SITE_PASSWORD` | The shared login. **Secret**                                       |
+| `SESSION_HOURS`                  | How long a sign-in lasts (default 12)                              |
+| `SITE_URL`, `SITE_BASE`          | Where the site is served                                           |
+
+### In GitHub Actions
+
+CI has no `.env` files: the same names come from **Settings → Secrets and variables → Actions**, and
+a workflow passes them to the build step as environment variables.
+
+- **Secrets** (masked in logs): `PLATE_DELIVERY_TOKEN`, `SITE_USERNAME`, `SITE_PASSWORD`.
+- **Variables**: `PLATE_LANGUAGE_PRNS`, `PLATE_HOME_PATH`, `SITE_LANGUAGES`, `SESSION_HOURS`,
+  `SITE_URL`, `SITE_BASE`.
+
+```yaml
+- run: pnpm build
+  env:
+    PLATE_DELIVERY_TOKEN: ${{ secrets.PLATE_DELIVERY_TOKEN }}
+    SITE_USERNAME: ${{ secrets.SITE_USERNAME }}
+    SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+    PLATE_LANGUAGE_PRNS: ${{ vars.PLATE_LANGUAGE_PRNS }}
+    SITE_URL: ${{ vars.SITE_URL }}
+```
+
+The pull request checks (`ci.yml`) need none of them: they build the demo content. The real build
+with secrets belongs in the deploy workflow, which comes with the hosting choice. A deploy should
+fail when `PLATE_DELIVERY_TOKEN`, `SITE_USERNAME` or `SITE_PASSWORD` is missing, so pages are never
+published unprotected. The theme sync stays local: it needs the Delta CLI and its profile.
 
 ## Search
 

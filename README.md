@@ -13,7 +13,7 @@ CMS ──► adapter (packages/plate/*) ──► core model (packages/core) �
 Requires Node 22.18+ and pnpm 10 (`corepack enable`).
 
 ```sh
-cp .env.example .env   # set PLATE_DELIVERY_TOKEN, or CONTENT_SOURCE=demo to try it without a CMS
+cp apps/site/.env.example apps/site/.env   # set PLATE_DELIVERY_TOKEN, or CONTENT_SOURCE=demo
 pnpm install
 pnpm dev               # http://localhost:4321
 ```
