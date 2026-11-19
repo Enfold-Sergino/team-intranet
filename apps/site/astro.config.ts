@@ -1,6 +1,13 @@
+import { existsSync } from "node:fs";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import intranet from "./src/integrations";
+
+// Settings live in the repo root's .env (one for the whole monorepo); Astro would only look in
+// apps/site. Loaded into process.env, so the content source and the build integration both see them.
+// Variables already set (by the shell or CI) win.
+const rootEnv = new URL("../../.env", import.meta.url);
+if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 
 // Fully static output; fresh content arrives through publish-triggered rebuilds.
 // SITE_URL and SITE_BASE come from the environment the site is built for; locally both are unset.
