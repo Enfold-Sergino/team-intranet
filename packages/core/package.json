@@ -1,0 +1,17 @@
+{
+  "name": "@team-intranet/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CMS-agnostic content model: types, block schemas, ContentSource interface and site helpers.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@types/hast": "^3.0.5",
+    "zod": "^4.6.7"
+  }
+}

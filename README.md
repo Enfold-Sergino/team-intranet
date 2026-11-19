@@ -41,4 +41,5 @@ Rules: the site imports only `@team-intranet/core`; adapters depend on core, cor
 nothing. Workspace packages have no build step: they export their TypeScript source.
 
 The repo is public: never commit content exported from a CMS.
-# team-intranet
+
+The migration from `plate-intranet` follows [docs/PLAN.md](docs/PLAN.md).
