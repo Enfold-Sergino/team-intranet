@@ -47,7 +47,7 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | 3   | Site blocks and layout in Tailwind, rendering core types                       | Every block matches the old site; build passes  |        |
 | 4   | Build integration (encryption, search, links, report), host-independent        | The built site works behind the login           | Done   |
 | 5   | `plate/editor` + `/editor/` preview; `plate/theme` sync and check              | Draft preview and click-to-select work in Plate | Done   |
-| 6   | README, `ARCHITECTURE.md` ("add a CMS adapter"), editor guide                  | Old repo archived                               |        |
+| 6   | README, `ARCHITECTURE.md` ("add a CMS adapter"), `OPERATIONS.md`, editor guide | Docs complete; old repo archived                | Done   |
 
 ## Decisions
 
