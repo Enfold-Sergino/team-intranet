@@ -1,0 +1,225 @@
+---
+// Live preview for the CMS's editor. Plate loads <site>/editor/content-experiences/<path> in an
+// iframe (404.html forwards every such URL here) and posts the draft; this page renders it with the
+// same components as the static site (dist/editor/renderer.js).
+//
+// The page holds no content and is not encrypted: the draft comes from the editor window. Blocks
+// built from other pages read the published site from editor/site.json, encrypted like the pages:
+// inside the editor's iframe the intranet tab's sign-in isn't visible (partitioned storage), so the
+// preview has its own sign-in.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Live preview">
+  <main class="mx-auto max-w-5xl px-4 py-8 sm:px-8">
+    <div
+      id="preview-login"
+      hidden
+      class="mb-8 rounded-xl border border-line bg-surface p-4 text-sm"
+    >
+      <p class="mb-3 text-ink-muted">
+        Overviews, link lists and previous/next use the published pages. Sign in to show them in
+        this preview.
+      </p>
+      <form id="preview-login-form" class="flex flex-wrap gap-2">
+        <label class="sr-only" for="preview-username">
+          Username
+        </label>
+        <input
+          id="preview-username"
+          name="username"
+          autocomplete="username"
+          placeholder="Username"
+          required
+          class="rounded-lg border border-line bg-canvas px-3 py-1.5"
+        />
+        <label class="sr-only" for="preview-password">
+          Password
+        </label>
+        <input
+          id="preview-password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Password"
+          required
+          class="rounded-lg border border-line bg-canvas px-3 py-1.5"
+        />
+        <button
+          type="submit"
+          class="rounded-lg bg-accent px-3 py-1.5 font-medium text-on-accent hover:bg-accent-strong"
+        >
+          Sign in
+        </button>
+      </form>
+      <p id="preview-login-status" role="alert" class="mt-2 text-danger"></p>
+    </div>
+    <div id="preview" aria-live="polite">
+      <p class="text-ink-muted">Waiting for the editor…</p>
+    </div>
+  </main>
+</BaseLayout>
+
+<!-- Filled in by the build (src/integrations), like the login page; null on unprotected builds. -->
+<script id="auth-config" type="application/json" is:inline>
+  null
+</script>
+
+<style is:global>
+  [data-editor-hover] {
+    outline: 2px dashed var(--color-accent);
+    outline-offset: 4px;
+    cursor: pointer;
+  }
+  [data-editor-selected] {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+</style>
+
+<script>
+  import type { Page, SiteContent, SiteOptions } from "@team-intranet/core";
+  import type { EditorConnection } from "../../preview/connect";
+  import type * as RendererModule from "../../preview/render";
+  import { decrypt, readAuthConfig, signIn, storedKey, type Encrypted } from "../../lib/session";
+
+  type Renderer = typeof RendererModule;
+  type DataFile = { options: SiteOptions } & (
+    { encrypted: false; content: SiteContent } | ({ encrypted: true } & Encrypted)
+  );
+
+  const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+  const preview = document.getElementById("preview")!;
+  const loginPanel = document.getElementById("preview-login")!;
+  const loginStatus = document.getElementById("preview-login-status")!;
+  const status = (text: string) => {
+    const p = document.createElement("p");
+    p.className = "text-ink-muted";
+    p.textContent = text;
+    preview.replaceChildren(p);
+  };
+
+  // The renderer is a separate bundle: it holds every block component.
+  const renderer = import(/* @vite-ignore */ `${base}editor/renderer.js`) as Promise<Renderer>;
+  const dataFile: Promise<DataFile | null> = fetch(`${base}editor/site.json`, { cache: "no-cache" })
+    .then((response) => (response.ok ? (response.json() as Promise<DataFile>) : null))
+    .catch(() => null);
+
+  const empty = (): SiteContent => ({
+    pages: [],
+    items: [],
+    fetchedAt: new Date().toISOString(),
+    redirects: {},
+  });
+  let content = empty();
+  let page: Page | null = null;
+  let selected: string | null = null;
+  let renders = 0;
+  let editor: EditorConnection | null = null;
+
+  async function render() {
+    const file = await dataFile;
+    if (!page || !file) return;
+    const id = ++renders;
+    try {
+      const html = await (await renderer).renderPage(page, content, file.options);
+      if (id !== renders) return; // a newer draft arrived meanwhile
+      const scrollY = window.scrollY;
+      preview.innerHTML = html;
+      document.title = `${page.title || "Untitled"} · Live preview`;
+      if (selected) markSelected(selected);
+      window.scrollTo(0, scrollY);
+    } catch (error) {
+      console.error("[preview] render failed", error);
+      status(`Could not render this draft: ${error instanceof Error ? error.message : error}`);
+    }
+  }
+
+  /** The published site; false when it is encrypted and there is no key yet. */
+  async function loadContent(key: CryptoKey | null): Promise<boolean> {
+    const file = await dataFile;
+    if (!file) return true; // no data file: lists built from other pages stay empty
+    if (!file.encrypted) content = file.content;
+    else if (key) content = JSON.parse(await decrypt(key, file)) as SiteContent;
+    else return false;
+    return true;
+  }
+
+  // Click a block to select it in the editor; links don't navigate inside the preview.
+  const blockOf = (target: EventTarget | null) =>
+    target instanceof Element ? target.closest<HTMLElement>("[data-editor-id]") : null;
+  const visual = (block: HTMLElement) => block.firstElementChild; // the wrapper is display: contents
+  const clear = (attribute: string) =>
+    document.querySelectorAll(`[${attribute}]`).forEach((el) => el.removeAttribute(attribute));
+  const markSelected = (editorId: string) => {
+    clear("data-editor-selected");
+    const block = preview.querySelector<HTMLElement>(`[data-editor-id="${CSS.escape(editorId)}"]`);
+    if (block) visual(block)?.setAttribute("data-editor-selected", "");
+  };
+
+  preview.addEventListener("click", (event) => {
+    if ((event.target as Element).closest?.("a")) event.preventDefault();
+    const block = blockOf(event.target);
+    if (!block) return;
+    event.preventDefault();
+    selected = block.dataset.editorId!;
+    markSelected(selected);
+    editor?.select({ id: block.dataset.blockId!, editorId: selected });
+  });
+  preview.addEventListener("mouseover", (event) => {
+    clear("data-editor-hover");
+    const block = blockOf(event.target);
+    if (block) visual(block)?.setAttribute("data-editor-hover", "");
+  });
+  preview.addEventListener("mouseleave", () => clear("data-editor-hover"));
+
+  document.getElementById("preview-login-form")!.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const config = readAuthConfig();
+    if (!config) return;
+    const data = new FormData(form);
+    loginStatus.textContent = "";
+    try {
+      await signIn(config, String(data.get("username") ?? ""), String(data.get("password") ?? ""));
+      await loadContent(await storedKey());
+      loginPanel.hidden = true;
+      void render();
+    } catch {
+      loginStatus.textContent = "The username or password is incorrect.";
+    }
+  });
+
+  if (window.parent === window) {
+    status("This is the live preview for the CMS's editor. Open a page in the editor to use it.");
+  } else {
+    void (async () => {
+      try {
+        if (await loadContent(await storedKey())) return void render();
+      } catch {
+        // The stored key no longer fits (the password changed): sign in again.
+      }
+      loginPanel.hidden = false;
+    })();
+    void renderer.then(({ connectEditor }) => {
+      editor = connectEditor({
+        onPage: (draft) => {
+          page = draft;
+          void render();
+        },
+        onBlocks: (blocks) => {
+          if (!page) return;
+          page = { ...page, blocks };
+          void render();
+        },
+        onError: (error) => console.error("[preview] could not read the draft", error),
+      });
+    });
+    setTimeout(() => {
+      if (!page)
+        status(
+          "Connected, waiting for the editor to send the draft… If this stays, reload the preview in the editor.",
+        );
+    }, 8000);
+  }
+</script>

@@ -23,7 +23,12 @@ const visible = ctx.dev || ctx.editor;
 ---
 
 {Component && parsed.ok ? (
-  <div class="contents" data-block-type={block.type} data-block-id={visible ? block.id : undefined}>
+  <div
+    class="contents"
+    data-block-type={block.type}
+    data-block-id={visible ? block.id : undefined}
+    data-editor-id={ctx.editor ? block.editorId : undefined}
+  >
     <Component {...parsed.props} ctx={ctx} placement={placement}>
       {block.children.map((c, i) => (
         <Astro.self block={c} ctx={ctx} placement={child(i)} />

@@ -2,26 +2,17 @@
  * The site's content: one load per build, from the source named by CONTENT_SOURCE. The site only
  * sees the core model, so adding a CMS means adding a source here, nothing else.
  */
-import {
-  createSite,
-  findInvalidContent,
-  parseLanguages,
-  type ContentSource,
-  type Site,
-} from "@team-intranet/core";
+import { createSite, findInvalidContent, type ContentSource, type Site } from "@team-intranet/core";
 import { createPlateSource, plateConfigFromEnv } from "@team-intranet/plate-source";
 import { report } from "../integrations/report";
 import { demoSource } from "./demo";
+import { siteOptions } from "./options";
 
 // Vite's env has .env values; process.env has what the shell or CI sets.
 const env = { ...process.env, ...import.meta.env } as Record<string, string | undefined>;
 
-export const languages = parseLanguages(
-  env.SITE_LANGUAGES || "en-GB:EN:English:/,nl-NL:NL:Nederlands:/nl",
-);
-
-/** Sections read like a book: every page below them gets previous/next links. */
-const sequenceSections = ["/procedure-overview"];
+export const options = siteOptions(env);
+export const { languages } = options;
 
 function source(): ContentSource {
   switch (env.CONTENT_SOURCE || "plate") {
@@ -52,7 +43,7 @@ export function getSite(): Promise<Site> {
             message: `${p.message} (${p.id})`,
           })),
         );
-        return createSite(content, { languages, sequenceSections, siteName: "Team intranet" });
+        return createSite(content, options);
       });
     // Never keep a failed load: the next page load retries.
     loading.catch(() => (loading = undefined));

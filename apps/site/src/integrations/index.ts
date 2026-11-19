@@ -3,8 +3,9 @@
  * 1. links: every internal link and image must exist. A link missing the base path is a code bug
  *    (the build fails); a link to a page that doesn't exist is reported to editors.
  * 2. search: the title and text of every page go into search-index.json.
- * 3. login: with SITE_USERNAME + SITE_PASSWORD, every page and the search index are encrypted and the
- *    login page gets its settings. Without them (local builds) everything stays readable.
+ * 3. login: with SITE_USERNAME + SITE_PASSWORD, every page, the search index and the editor
+ *    preview's data are encrypted, and the login and preview pages get the login settings. Without
+ *    them (local builds) everything stays readable.
  * Plain files only, so the result can be served by any static host.
  */
 import { existsSync } from "node:fs";
@@ -25,8 +26,10 @@ import {
 import { report, type Finding } from "./report";
 import { searchEntry } from "./search-index";
 
-/** Pages anyone may open: they hold no content. */
-const PUBLIC = new Set(["/login/", "/404.html"]);
+/** Pages anyone may open: they hold no content (the editor preview gets its draft from the editor). */
+const PUBLIC = new Set(["/login/", "/404.html", "/editor/"]);
+/** Pages that get the login settings. */
+const SIGN_IN = ["/login/", "/editor/"];
 const NOT_SEARCHABLE = new Set([...PUBLIC, "/search/"]);
 
 async function walk(dir: string): Promise<string[]> {
@@ -73,9 +76,12 @@ export default function intranet(): AstroIntegration {
         const missingBase: string[] = [];
         const broken = new Map<string, Finding>();
         for (const { url } of pages) {
-          if (url === "/404.html") continue;
+          if (url === "/404.html" || url === "/editor/") continue;
           for (const link of extractUrls(html.get(url)!)) {
-            const problem = checkUrl(link, url, { base, exists });
+            const problem = checkUrl(link, url, {
+              base,
+              exists: (path) => path.startsWith("/editor/") || exists(path),
+            });
             if (problem?.kind === "missing-base") missingBase.push(`${url}: ${problem.target}`);
             else if (problem) {
               const page = url === "/" ? url : url.replace(/\/$/, "");
@@ -116,14 +122,18 @@ export default function intranet(): AstroIntegration {
           throw new Error(
             "dist/login/index.html is missing: encrypted pages would have no way to sign in.",
           );
-        if (login)
+        const config = key ? authConfig({ username, key, base, hours }) : null;
+        for (const page of pages.filter(({ url }) => SIGN_IN.includes(url)))
+          await writeFile(page.file, injectAuthConfig(html.get(page.url)!, config));
+        // The published site for the editor preview: its content is encrypted like the pages.
+        const previewData = join(dist, "editor", "site.json");
+        if (key && existsSync(previewData)) {
+          const { content, options } = JSON.parse(await readFile(previewData, "utf8"));
           await writeFile(
-            login.file,
-            injectAuthConfig(
-              html.get("/login/")!,
-              key ? authConfig({ username, key, base, hours }) : null,
-            ),
+            previewData,
+            JSON.stringify({ options, encrypted: true, ...encrypt(JSON.stringify(content), key) }),
           );
+        }
         if (key)
           await Promise.all(
             pages

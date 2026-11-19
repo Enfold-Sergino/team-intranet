@@ -46,7 +46,7 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | 2   | `plate/connector`, `plate/cast`, `plate/source`                                | Same pages and items as the old loader          |        |
 | 3   | Site blocks and layout in Tailwind, rendering core types                       | Every block matches the old site; build passes  |        |
 | 4   | Build integration (encryption, search, links, report), host-independent        | The built site works behind the login           | Done   |
-| 5   | `plate/editor` + `/preview`; `plate/theme` sync and check                      | Draft preview and click-to-select work in Plate |        |
+| 5   | `plate/editor` + `/editor/` preview; `plate/theme` sync and check              | Draft preview and click-to-select work in Plate | Done   |
 | 6   | README, `ARCHITECTURE.md` ("add a CMS adapter"), editor guide                  | Old repo archived                               |        |
 
 ## Decisions
@@ -118,6 +118,18 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | `scripts/lib/protect.mjs`, `links.mjs`, `search.mjs`             | `src/integrations/protect.ts`, `links.ts`, `search-index.ts` |
 | `lib/content-report.ts` + broken-link report                     | `src/integrations/report.ts` (one report for both)           |
 | `lib/session.ts`, `return-to.ts`, `pages/login`, `pages/search`  | same, Tailwind; sign-out in the header                       |
+
+## Moved in phase 5
+
+| From `plate-intranet`                                              | To                                                              |
+| ------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `plate-content/preview.ts` (draft → experience)                    | `plate/editor/draft.ts` (draft → core `Page`, via plate/source) |
+| `pages/editor/index.astro` (connector, origin check)               | `plate/editor/connect.ts` + a CMS-agnostic `pages/editor/`      |
+| `src/editor/render.ts`, `scripts/build-editor.mjs`, `site.json.ts` | `src/preview/*`, `scripts/build-preview.mjs`, `pages/editor/`   |
+| `delta/`, `delta.config.ts`, `scripts/sync-theme.mjs`, theme-sync  | `plate/theme` (`delta/`, `scripts/sync.ts`, `src/theme.ts`)     |
+| `generate-schemas.mjs`, `check-theme.mjs` (`plate:check`)          | `plate/theme/src/contract.ts`, checked by `pnpm test`           |
+
+`pnpm plate:sync` runs a TypeScript script with Node's type stripping (Node 22.18 or newer).
 
 Waiting for the hosting decision: deploy workflows, the publish webhook, editor notifications
 (Slack/Teams; the reports in `.reports/` are ready for it) and host-specific files.

@@ -1,9 +1,9 @@
 // Pages rendered with the Astro container, from the invented demo content.
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
-import { createSite, parseLanguages, type Block } from "@team-intranet/core";
+import { blockSchemas, createSite, parseLanguages, type Block } from "@team-intranet/core";
 import { beforeAll, describe, expect, it } from "vitest";
 import PageView from "../src/components/page/PageView.astro";
-import { fileNameForType, typeFromFileName } from "../src/components/page/registry";
+import { blocks, fileNameForType, typeFromFileName } from "../src/components/page/registry";
 import { demoSource } from "../src/content/demo";
 
 const languages = parseLanguages("en-GB:EN:English:/,nl-NL:NL:Nederlands:/nl");
@@ -65,6 +65,10 @@ describe("PageView", () => {
 });
 
 describe("block registry", () => {
+  it("has a component for every block type in the core contract, and nothing else", () => {
+    expect(Object.keys(blocks).sort()).toEqual(Object.keys(blockSchemas).sort());
+  });
+
   it("maps file names to block types and back", () => {
     expect(typeFromFileName("../../blocks/ExperienceListBlock.astro")).toBe("experience-list");
     expect(typeFromFileName("notABlock.astro")).toBeNull();
