@@ -10,6 +10,7 @@ import {
   type Site,
 } from "@team-intranet/core";
 import { createPlateSource, plateConfigFromEnv } from "@team-intranet/plate-source";
+import { report } from "../integrations/report";
 import { demoSource } from "./demo";
 
 // Vite's env has .env values; process.env has what the shell or CI sets.
@@ -44,10 +45,12 @@ export function getSite(): Promise<Site> {
     loading = source()
       .load()
       .then((content) => {
-        report(
-          findInvalidContent(content).map(
-            (p) => `${p.page} · ${p.subject}${p.field ? ` · ${p.field}` : ""}: ${p.message}`,
-          ),
+        reportOnce(
+          findInvalidContent(content).map((p) => ({
+            page: p.page,
+            subject: `${p.subject}${p.field ? ` · field "${p.field}"` : ""}`,
+            message: `${p.message} (${p.id})`,
+          })),
         );
         return createSite(content, { languages, sequenceSections, siteName: "Team intranet" });
       });
@@ -59,12 +62,18 @@ export function getSite(): Promise<Site> {
 
 /** Content left out of the site, reported once per distinct list (Astro may load this module twice). */
 const REPORTED = Symbol.for("team-intranet.content-report");
-function report(lines: string[]) {
+function reportOnce(findings: Parameters<typeof report>[2]) {
   const state = globalThis as { [REPORTED]?: string };
-  const fingerprint = lines.join("\n");
-  if (!lines.length || state[REPORTED] === fingerprint) return;
+  const fingerprint = JSON.stringify(findings);
+  if (state[REPORTED] === fingerprint) return;
   state[REPORTED] = fingerprint;
-  console.warn(
-    `[content] ${lines.length} problem(s), left out of the site:\n  ${lines.join("\n  ")}`,
+  report(
+    "content-problems",
+    {
+      title: "Content left out",
+      intro:
+        "The site was published without these blocks and items. Fix them in the CMS and publish again; in development they show the problem in place.",
+    },
+    findings,
   );
 }

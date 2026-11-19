@@ -45,7 +45,7 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | 1   | `core`: model, block/item contract, validation, site helpers, with their tests | The ported tests pass                           | Done   |
 | 2   | `plate/connector`, `plate/cast`, `plate/source`                                | Same pages and items as the old loader          |        |
 | 3   | Site blocks and layout in Tailwind, rendering core types                       | Every block matches the old site; build passes  |        |
-| 4   | Build integration (encryption, search, links, report), host-independent        | The built site works behind the login           |        |
+| 4   | Build integration (encryption, search, links, report), host-independent        | The built site works behind the login           | Done   |
 | 5   | `plate/editor` + `/preview`; `plate/theme` sync and check                      | Draft preview and click-to-select work in Plate |        |
 | 6   | README, `ARCHITECTURE.md` ("add a CMS adapter"), editor guide                  | Old repo archived                               |        |
 
@@ -110,8 +110,17 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | `lib/cast.ts` (render, excerpt)                 | `lib/rich-text.ts` (sanitize + adapt), core `rich-text.ts` |
 | `lib/url.ts`, `date.ts`, `blocks.ts`            | `lib/url.ts`, `date.ts`, `blocks.ts`                       |
 
-Left for later phases: `content-report.ts`, `return-to.ts`, `session.ts`,
-search index extraction (phase 4, site integrations).
+## Moved in phase 4
+
+| From `plate-intranet`                                            | To `apps/site`                                               |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| `scripts/postbuild.mjs`, `check-links.mjs` (chained after build) | `src/integrations/index.ts` (one `astro:build:done` hook)    |
+| `scripts/lib/protect.mjs`, `links.mjs`, `search.mjs`             | `src/integrations/protect.ts`, `links.ts`, `search-index.ts` |
+| `lib/content-report.ts` + broken-link report                     | `src/integrations/report.ts` (one report for both)           |
+| `lib/session.ts`, `return-to.ts`, `pages/login`, `pages/search`  | same, Tailwind; sign-out in the header                       |
+
+Waiting for the hosting decision: deploy workflows, the publish webhook, editor notifications
+(Slack/Teams; the reports in `.reports/` are ready for it) and host-specific files.
 
 ## Risks
 

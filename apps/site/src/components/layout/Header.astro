@@ -46,9 +46,29 @@ const { siteName, logo } = site.settings;
     />
   </form>
   <LanguageSwitcher links={languages} />
+  <button
+    type="button"
+    data-sign-out
+    hidden
+    class="rounded-lg px-2 py-1.5 text-sm text-ink-muted hover:bg-surface-muted hover:text-ink"
+  >
+    Sign out
+  </button>
 </header>
 
 <script>
+  import { hasSession, signOut } from "../../lib/session";
+
+  // Shown only when signed in (protected builds).
+  const signOutButton = document.querySelector<HTMLButtonElement>("[data-sign-out]");
+  if (signOutButton && hasSession()) {
+    signOutButton.hidden = false;
+    signOutButton.addEventListener("click", () => {
+      signOut();
+      location.assign(`${import.meta.env.BASE_URL.replace(/\/?$/, "/")}login/`);
+    });
+  }
+
   const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
   const sidebar = document.querySelector<HTMLElement>("[data-sidebar]");
   const setOpen = (open: boolean) => {

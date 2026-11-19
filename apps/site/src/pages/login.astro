@@ -1,0 +1,95 @@
+---
+import { getSite } from "../content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/url";
+
+const { siteName, logo } = (await getSite()).settings;
+---
+
+<BaseLayout title={`Sign in · ${siteName}`}>
+  <main class="flex min-h-screen items-center justify-center p-4">
+    <section
+      aria-labelledby="login-title"
+      class="w-full max-w-sm rounded-2xl border border-line bg-surface p-8 shadow-md"
+    >
+      <img
+        src={withBase(logo?.url ?? "/assets/logo.svg")}
+        alt=""
+        height="48"
+        class="mb-6 h-12 w-auto"
+      />
+      <h1 id="login-title" class="text-2xl font-semibold tracking-tight">
+        {siteName}
+      </h1>
+      <p class="mt-1 mb-6 text-ink-muted">Sign in with the shared team account.</p>
+      <form id="login-form" novalidate class="flex flex-col gap-4">
+        <label class="flex flex-col gap-1 text-sm font-medium">
+          Username
+          <input
+            name="username"
+            autocomplete="username"
+            required
+            autofocus
+            class="rounded-lg border border-line bg-canvas px-3 py-2 font-normal"
+          />
+        </label>
+        <label class="flex flex-col gap-1 text-sm font-medium">
+          Password
+          <input
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            class="rounded-lg border border-line bg-canvas px-3 py-2 font-normal"
+          />
+        </label>
+        <button
+          type="submit"
+          class="rounded-lg bg-accent px-4 py-2 font-medium text-on-accent hover:bg-accent-strong disabled:opacity-60"
+        >
+          Sign in
+        </button>
+        <p id="login-status" role="alert" class="min-h-5 text-sm text-danger"></p>
+      </form>
+    </section>
+  </main>
+</BaseLayout>
+
+<!-- Filled in by the build (src/integrations); null means the build is not protected. -->
+<script id="auth-config" type="application/json" is:inline>
+  null
+</script>
+
+<script>
+  import { safeReturnTo } from "../lib/return-to";
+  import { readAuthConfig, signIn } from "../lib/session";
+
+  // The password never leaves the browser: it derives the key the pages were encrypted with.
+  const form = document.querySelector<HTMLFormElement>("#login-form")!;
+  const status = document.querySelector<HTMLElement>("#login-status")!;
+  const button = form.querySelector<HTMLButtonElement>("button")!;
+  const config = readAuthConfig();
+  const base = config?.base ?? import.meta.env.BASE_URL.replace(/\/?$/, "/");
+  const returnTo = () =>
+    safeReturnTo(new URLSearchParams(location.search).get("returnTo"), base, location.origin);
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const username = String(data.get("username") ?? "");
+    const password = String(data.get("password") ?? "");
+    if (!username || !password)
+      return void (status.textContent = "Enter your username and password.");
+    if (!config) return location.assign(returnTo()); // unprotected build: nothing to check
+    button.disabled = true;
+    status.textContent = "";
+    try {
+      const { stored } = await signIn(config, username, password);
+      if (stored) return location.assign(returnTo());
+      status.textContent = "Your browser blocks storage for this site. Allow it to sign in.";
+    } catch {
+      status.textContent = "The username or password is incorrect.";
+    }
+    button.disabled = false;
+  });
+</script>

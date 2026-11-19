@@ -1,0 +1,95 @@
+---
+// Full-text search in the browser. The index is built after the pages (src/integrations) and, on
+// protected builds, encrypted like them: it is decrypted with the session key.
+import { getSite, languages } from "../content";
+import AppLayout from "../layouts/AppLayout.astro";
+
+const site = (await getSite()).forLanguage(languages.find((l) => l.root === "/") ?? languages[0]!);
+---
+
+<AppLayout site={site} title="Search" currentPath="/search">
+  <h1 class="mb-6 text-3xl font-semibold tracking-tight">Search</h1>
+  <form role="search" data-search-form class="flex gap-2">
+    <label class="sr-only" for="search-query">
+      Search the intranet
+    </label>
+    <input
+      id="search-query"
+      name="q"
+      type="search"
+      placeholder="Search the intranet"
+      autofocus
+      class="flex-1 rounded-lg border border-line bg-surface px-3 py-2"
+    />
+    <button
+      type="submit"
+      class="rounded-lg bg-accent px-4 py-2 font-medium text-on-accent hover:bg-accent-strong"
+    >
+      Search
+    </button>
+  </form>
+  <p data-search-status aria-live="polite" class="mt-4 text-sm text-ink-muted"></p>
+  <ol data-search-results class="mt-4 flex flex-col gap-3"></ol>
+</AppLayout>
+
+<script>
+  import { search, type SearchPage } from "@team-intranet/core";
+  import { decrypt, storedKey } from "../lib/session";
+
+  const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+  const form = document.querySelector<HTMLFormElement>("[data-search-form]")!;
+  const input = form.querySelector("input")!;
+  const status = document.querySelector<HTMLElement>("[data-search-status]")!;
+  const list = document.querySelector<HTMLOListElement>("[data-search-results]")!;
+
+  async function loadIndex(): Promise<SearchPage[]> {
+    const response = await fetch(`${base}search-index.json`, { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!data.encrypted) return data.pages;
+    const key = await storedKey();
+    if (!key) throw new Error("not signed in");
+    return JSON.parse(await decrypt(key, data)).pages;
+  }
+
+  let index: Promise<SearchPage[]> | undefined;
+  async function run(query: string) {
+    list.replaceChildren();
+    status.textContent = query.trim() ? "Searching…" : "";
+    if (!query.trim()) return;
+    try {
+      index ??= loadIndex();
+      const results = search(await index, query);
+      status.textContent = results.length
+        ? `${results.length}${results.length === 50 ? "+" : ""} result${results.length === 1 ? "" : "s"} for “${query}”`
+        : `No pages found for “${query}”.`;
+      for (const result of results) {
+        const item = document.createElement("li");
+        item.className = "rounded-xl border border-line bg-surface p-4";
+        const link = document.createElement("a");
+        link.href = result.url;
+        link.textContent = result.title;
+        link.className = "font-medium";
+        const text = document.createElement("p");
+        text.textContent = result.snippet;
+        text.className = "mt-1 text-sm text-ink-muted";
+        item.append(link, text);
+        list.append(item);
+      }
+    } catch (error) {
+      index = undefined;
+      console.error("[search]", error);
+      status.textContent = "Search is unavailable right now. Try reloading the page.";
+    }
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const url = new URL(location.href);
+    url.searchParams.set("q", input.value);
+    history.replaceState(null, "", url);
+    void run(input.value);
+  });
+  input.value = new URLSearchParams(location.search).get("q") ?? "";
+  void run(input.value);
+</script>
