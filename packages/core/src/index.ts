@@ -12,3 +12,4 @@ export * from "./site";
 export * from "./tags";
 export * from "./table";
 export * from "./search";
+export * from "./rich-text";
