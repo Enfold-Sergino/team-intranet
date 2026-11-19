@@ -9,5 +9,9 @@
   },
   "scripts": {
     "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@team-intranet/core": "workspace:*",
+    "zod": "^4.6.7"
   }
 }
