@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@platecms/delta-cast-util-to-hast@1.23.0':
+    hash: c5ea4f76f020fdcdf7a9561511ab211a98180c091ed10b0711c8684b0a4a8a4e
+    path: patches/@platecms__delta-cast-util-to-hast@1.23.0.patch
+
 importers:
 
   .:
@@ -79,13 +84,47 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
 
-  packages/plate/cast: {}
+  packages/plate/cast:
+    dependencies:
+      '@platecms/delta-cast-util-to-hast':
+        specifier: 1.23.0
+        version: 1.23.0(patch_hash=c5ea4f76f020fdcdf7a9561511ab211a98180c091ed10b0711c8684b0a4a8a4e)
+      '@team-intranet/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@types/hast':
+        specifier: ^3.0.5
+        version: 3.0.5
+    devDependencies:
+      hast-util-to-html:
+        specifier: ^9.0.7
+        version: 9.0.7
 
-  packages/plate/connector: {}
+  packages/plate/connector:
+    dependencies:
+      '@team-intranet/core':
+        specifier: workspace:*
+        version: link:../../core
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
 
   packages/plate/editor: {}
 
-  packages/plate/source: {}
+  packages/plate/source:
+    dependencies:
+      '@platecms/delta-client':
+        specifier: 1.30.2
+        version: 1.30.2
+      '@team-intranet/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@team-intranet/plate-cast':
+        specifier: workspace:*
+        version: link:../cast
+      '@team-intranet/plate-connector':
+        specifier: workspace:*
+        version: link:../connector
 
   packages/plate/theme: {}
 
@@ -599,6 +638,20 @@ packages:
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
+  '@platecms/delta-cast-util-to-hast@1.23.0':
+    resolution: {integrity: sha512-wa8LV/b4eonCVTpZB08fmEgBsSCzGIN70nzyiVkkroLSxx8LnxQOEug2DOAW4M5dglDFXFZYzLiVN2rpS1hP7Q==}
+
+  '@platecms/delta-cast@1.23.0':
+    resolution: {integrity: sha512-TyAhZgXUUKnzsf82sszMTpFsce3r3V5RaPUmPiCRbzXzqSHZCVdQkxtWcEsNwNJBEJb7ZWKWuIHN5/F8PfADbQ==}
+    peerDependencies:
+      '@platecms/delta-plate-resource-notation': 1.23.0
+
+  '@platecms/delta-client@1.30.2':
+    resolution: {integrity: sha512-kjHxZ+k1Rc8anyYl6c8QPjoReSFOvChHM/l1Ek+t11R54e81Qvt02NFbMlS6Xt0vOKeiAMyPRLd0xtoVsglhxg==}
+
+  '@platecms/delta-plate-resource-notation@1.23.0':
+    resolution: {integrity: sha512-RXuQioTEiKEIU9uF9TQ9LDZCMZ05aGoYdS4u8wxsWalYCkJmCqftCw1A6vmr02Re95x8hkvtGGgS3D9b3xuung==}
+
   '@prettier/parse-srcset@3.1.0':
     resolution: {integrity: sha512-FIRv2rZotO9NP/r66taYqD1zICpPiBbrECqjKV/xqNotqDxF7fLzzUeK+1RSRx9Tenk0DajR/GcRmTJ2qtHaKQ==}
 
@@ -1091,6 +1144,9 @@ packages:
     resolution: {integrity: sha512-d1uM8k5UZEyPza1n/MG3ko8nKupKN0KJpFsipgPcgaCCvV+IqIfJ+NzTjetlLM+UcXZx3+cLrNr76+eAO7G1Mw==}
     engines: {node: '>=8'}
 
+  class-transformer@0.5.1:
+    resolution: {integrity: sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==}
+
   cliui@9.0.1:
     resolution: {integrity: sha512-k7ndgKhwoQveBL+/1tqGJYNz097I7WOvwbmmU2AR5+magtbjPWQTS1C5vzGkBC8Ym8UWRzfKUzUUqFLypY4Q+w==}
     engines: {node: '>=20'}
@@ -1407,6 +1463,10 @@ packages:
 
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
+
+  hast@1.0.0:
+    resolution: {integrity: sha512-vFUqlRV5C+xqP76Wwq2SrM0kipnmpxJm7OfvVXpB35Fp+Fn4MV+ozr+JZr5qFvyR1q/U+Foim2x+3P+x9S1PLA==}
+    deprecated: Renamed to rehype
 
   hookified@1.15.1:
     resolution: {integrity: sha512-MvG/clsADq1GPM2KGo2nyfaWVyn9naPiXrqIe4jYjXNZQt238kWyOGrsyc/DmRAQ+Re6yeo6yX/yoNCG5KAEVg==}
@@ -1811,6 +1871,9 @@ packages:
     resolution: {integrity: sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==}
     engines: {node: '>= 20.19.0'}
 
+  reflect-metadata@0.2.2:
+    resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
+
   regex-recursion@6.0.2:
     resolution: {integrity: sha512-0YCaSCq2VRIebiaUviZNs0cBz1kg5kVS2UKUfNIx8YVs1cN3AV7NTctO5FOKBA+UT2BPJIWZauYHPqJODG50cg==}
 
@@ -1966,6 +2029,9 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
   tslib@2.9.1:
     resolution: {integrity: sha512-a4Ux9VKuIMHsOS7ENbEq6hK2ZGYIT27Rtl0E4eD9KqwxhKiQeMZE/9xb3IdYwWaSOyIBQLExhQgXDTYoiCxnWA==}
@@ -2856,6 +2922,31 @@ snapshots:
 
   '@pkgr/core@0.3.6': {}
 
+  '@platecms/delta-cast-util-to-hast@1.23.0(patch_hash=c5ea4f76f020fdcdf7a9561511ab211a98180c091ed10b0711c8684b0a4a8a4e)':
+    dependencies:
+      '@platecms/delta-cast': 1.23.0(@platecms/delta-plate-resource-notation@1.23.0)
+      '@platecms/delta-plate-resource-notation': 1.23.0
+      class-transformer: 0.5.1
+      hast: 1.0.0
+      reflect-metadata: 0.2.2
+      tslib: 2.8.1
+      zwitch: 2.0.4
+
+  '@platecms/delta-cast@1.23.0(@platecms/delta-plate-resource-notation@1.23.0)':
+    dependencies:
+      '@platecms/delta-plate-resource-notation': 1.23.0
+      class-transformer: 0.5.1
+      reflect-metadata: 0.2.2
+      tslib: 2.8.1
+
+  '@platecms/delta-client@1.30.2': {}
+
+  '@platecms/delta-plate-resource-notation@1.23.0':
+    dependencies:
+      class-transformer: 0.5.1
+      reflect-metadata: 0.2.2
+      tslib: 2.8.1
+
   '@prettier/parse-srcset@3.1.0': {}
 
   '@rolldown/binding-android-arm-eabi@1.2.19':
@@ -3411,6 +3502,8 @@ snapshots:
 
   ci-info@4.5.0: {}
 
+  class-transformer@0.5.1: {}
+
   cliui@9.0.1:
     dependencies:
       string-width: 7.2.0
@@ -3731,6 +3824,8 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.5
 
+  hast@1.0.0: {}
+
   hookified@1.15.1: {}
 
   hookified@2.2.0: {}
@@ -4018,6 +4113,8 @@ snapshots:
 
   readdirp@5.1.1: {}
 
+  reflect-metadata@0.2.2: {}
+
   regex-recursion@6.0.2:
     dependencies:
       regex-utilities: 2.3.0
@@ -4218,6 +4315,8 @@ snapshots:
   ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
+
+  tslib@2.8.1: {}
 
   tslib@2.9.1: {}
 

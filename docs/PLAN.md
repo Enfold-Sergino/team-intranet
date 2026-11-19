@@ -59,6 +59,10 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
   languages and sequence sections are options, not environment reads, so core stays pure.
 - **CMS quirks stay in the adapter:** the `/home` alias, item languages by Plate language PRN, request
   batching (`mapLimit`).
+- **Plate values are mapped by their value type.** delta-client's `parseDataFrom…` parsers drop the
+  value type, which the core shapes need (smart text → HAST, asset, path part, tag, linked item), so
+  `plate/source` maps the accessible format itself. delta-client still supplies the value type names,
+  and will supply the editor connection and the GraphQL → accessible converter in phase 5.
 - **The live preview is CMS-agnostic:** the adapter delivers a core `Page`, and the site's `/preview`
   route renders it with the same components.
 
@@ -73,8 +77,17 @@ Each phase is one pull request; `format:check`, `lint`, `check`, `test` and `bui
 | `lib/coerce.ts`, `normalizePath`                              | `text.ts`                                         |
 | `lib/tags.ts`, `table.ts` (without base path), `search.ts`    | `tags.ts`, `table.ts`, `search.ts`                |
 
-Left for later phases: `useHomeAlias`, `parseItemLanguages`, `mapLimit` (phase 2, plate/source);
-`url.ts`, `date.ts`, `blocks.ts` (phase 3, site); `content-report.ts`, `return-to.ts`, `session.ts`,
+## Moved in phase 2
+
+| From `plate-intranet`                                     | To                                                |
+| --------------------------------------------------------- | ------------------------------------------------- |
+| `cda.ts`: requests, retries, discovery, items, `mapLimit` | `plate/connector` (`createCdaClient`)             |
+| `plate-content/schemas.ts` (CDA responses)                | `plate/connector/schemas.ts`                      |
+| `lib/cast.ts` (CAST → HTML)                               | `plate/cast` (CAST → HAST with Plate's converter) |
+| `cda.ts`: mapping, tags, `assertUniquePaths`              | `plate/source/map.ts`, `source.ts`                |
+| `lib/site.ts`: `useHomeAlias`, `parseItemLanguages`       | `plate/source/source.ts`                          |
+
+Left for later phases: `url.ts`, `date.ts`, `blocks.ts` (phase 3, site); `content-report.ts`, `return-to.ts`, `session.ts`,
 search index extraction (phase 4, site integrations).
 
 ## Risks
@@ -82,7 +95,8 @@ search index extraction (phase 4, site integrations).
 - **Licence.** The `@platecms/delta-cast*` packages are marked `UNLICENSED` and this repo is public.
   Get written permission from Plate before depending on them. Fallback: `plate/cast` keeps its own
   converter behind the same interface.
-- **Packaging.** Those packages ship only `.ts` sources while `main` points to `.js`: `plate/cast`
-  aliases them to their source and lets Vite compile them (`ssr.noExternal`).
+- **Packaging.** `delta-cast-util-to-hast` ships only `.ts` sources (with `main` pointing to `.js`).
+  Vite compiles them; a pnpm patch (`patches/`) adds a small `index.d.ts`, because the sources don't
+  pass a strict type check. The site will also need `ssr.noExternal` for it (phase 3).
 - **Live preview.** It runs Astro components in the browser through Astro's internal runtime:
   `astro` stays pinned to an exact version, guarded by a renderer test.

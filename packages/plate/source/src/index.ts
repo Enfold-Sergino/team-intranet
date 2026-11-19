@@ -1,2 +1,3 @@
-/** ContentSource for Plate: maps experiences and content items to the core model. Filled in a later phase. */
-export {};
+/** Plate as a ContentSource: loads a channel through plate/connector and maps it to the core model. */
+export * from "./map";
+export * from "./source";

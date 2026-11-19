@@ -9,5 +9,11 @@
   },
   "scripts": {
     "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@platecms/delta-client": "1.30.2",
+    "@team-intranet/core": "workspace:*",
+    "@team-intranet/plate-cast": "workspace:*",
+    "@team-intranet/plate-connector": "workspace:*"
   }
 }
